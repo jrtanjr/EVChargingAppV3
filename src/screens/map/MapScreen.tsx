@@ -1,0 +1,397 @@
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { View, StyleSheet, Text, Keyboard, TextInput } from 'react-native';
+import MapView, { Marker, Region } from 'react-native-maps';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import TopBar from '../../components/map/TopBar';
+import StationPopup from '../../components/stations/StationPopup';
+import FilterModal from '../../components/map/FilterModal';
+import SearchBar from '../../components/map/SearchBar';
+
+import { fetchStationsFromAPI, transformStations } from '../../services/api/apiService';
+import { insertStationsWithConnectors, getStations, getConnectorsByStation } from '../../services/database/stationService';
+
+type Station = {
+  id: number;
+  latitude: number;
+  longitude: number;
+  available_ports: number;
+  name?: string;
+  address?: string;
+};
+
+const DEFAULT_REGION: Region = {
+  latitude: 3.139,
+  longitude: 101.6869,
+  latitudeDelta: 0.5,
+  longitudeDelta: 0.5,
+};
+
+export default function MapScreen({ navigation }: any) {
+  const [stations, setStations] = useState<Station[]>([]);
+  const [filteredStations, setFilteredStations] = useState<Station[]>([]);
+  const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+
+  const [search, setSearch] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
+
+  const [suggestions, setSuggestions] = useState<Station[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [region, setRegion] = useState<Region>(DEFAULT_REGION);
+
+  const inputRef = useRef<TextInput>(null);
+  const mapRef = useRef<MapView | null>(null);
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const init = async () => {
+    try {
+      const existing = await getStations();
+
+      if (existing.length > 0) {
+        setStations(existing);
+        setFilteredStations(existing);
+        return;
+      }
+
+      const apiData = await fetchStationsFromAPI();
+      const cleanData = transformStations(apiData);
+
+      await insertStationsWithConnectors(cleanData);
+
+      const data = await getStations();
+      setStations(data);
+      setFilteredStations(data);
+    } catch (error) {
+      console.log('LOAD ERROR:', error);
+    }
+  };
+
+  // ==============================
+  // SEARCH
+  // ==============================
+  useEffect(() => {
+    const trimmed = search.trim().toLowerCase();
+
+    if (!trimmed) {
+      setFilteredStations(stations);
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const result = stations.filter((s) =>
+      (s.name?.toLowerCase() || '').includes(trimmed) ||
+      (s.address?.toLowerCase() || '').includes(trimmed)
+    );
+
+    setFilteredStations(result);
+    setSuggestions(result.slice(0, 5));
+    setShowSuggestions(true);
+  }, [search, stations]);
+
+  // ==============================
+  // RESET HELPERS
+  // ==============================
+  const clearSearchUI = () => {
+    setSearch('');
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const resetFilters = () => {
+    setFilteredStations(stations);
+  };
+
+  const resetUI = () => {
+    clearSearchUI();
+    resetFilters();
+    setSelectedStation(null);
+  };
+
+  // ==============================
+  // FOCUS
+  // ==============================
+  const focusOnStation = (station: Station) => {
+    if (station.latitude == null || station.longitude == null) return;
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude: station.latitude,
+        longitude: station.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      },
+      500
+    );
+
+    setSelectedStation(station);
+  };
+
+  // ==============================
+  // FILTER
+  // ==============================
+  const applyFilter = async (filter: any) => {
+    try {
+      if (filter.type === 'ALL') {
+        resetUI();
+        setShowFilter(false);
+
+        mapRef.current?.animateToRegion(DEFAULT_REGION, 500);
+        setRegion(DEFAULT_REGION);
+        return;
+      }
+
+      const results = await Promise.all(
+        stations.map(async (station) => {
+          const connectors = await getConnectorsByStation(station.id);
+
+          const matchAC =
+            filter.type === 'AC' &&
+            connectors.some(c => c.current_type.includes('AC'));
+
+          const matchDC =
+            filter.type === 'DC' &&
+            connectors.some(c => c.current_type.includes('DC'));
+
+          return matchAC || matchDC ? station : null;
+        })
+      );
+
+      let result = results.filter(Boolean) as Station[];
+
+      if (search) {
+        result = result.filter((s) =>
+          (s.name?.toLowerCase() || '').includes(search.toLowerCase())
+        );
+      }
+
+      setFilteredStations(result);
+      setShowFilter(false);
+
+      mapRef.current?.animateToRegion(DEFAULT_REGION, 500); // reset view to show all results
+      setRegion(DEFAULT_REGION);
+
+    } catch (error) {
+      console.log('FILTER ERROR:', error);
+    }
+  };
+
+  // ==============================
+  // CLUSTER LOGIC
+  // ==============================
+  const clusters = useMemo(() => {
+    const threshold = region.latitudeDelta / 10;
+    const result: Station[][] = [];
+    const visited = new Set<number>();
+
+    filteredStations.forEach((s, i) => {
+      if (visited.has(i)) return;
+
+      const group = [s];
+      visited.add(i);
+
+      filteredStations.forEach((other, j) => {
+        if (i !== j && !visited.has(j)) {
+          const distance =
+            Math.abs(s.latitude - other.latitude) +
+            Math.abs(s.longitude - other.longitude);
+
+          if (distance < threshold) {
+            group.push(other);
+            visited.add(j);
+          }
+        }
+      });
+
+      result.push(group);
+    });
+
+    return result;
+  }, [filteredStations, region]);
+
+  return (
+    <View style={styles.container}>
+
+      <View style={styles.topBarContainer}>
+        <TopBar navigation={navigation} />
+      </View>
+
+      <View style={styles.searchWrapper}>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onFilterPress={() => setShowFilter(true)}
+        />
+
+        {showSuggestions && suggestions.length > 0 && (
+          <View style={styles.suggestionBox}>
+            {suggestions.map((item) => (
+              <Text
+                key={item.id}
+                style={styles.suggestionItem}
+                onPress={() => {
+                  setSearch(item.name || '');
+                  setShowSuggestions(false);
+                  focusOnStation(item);
+                }}
+              >
+                {item.name}
+              </Text>
+            ))}
+          </View>
+        )}
+      </View>
+
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        initialRegion={DEFAULT_REGION}
+        onRegionChangeComplete={(r) => setRegion(r)}
+        onPress={() => {
+          resetUI();
+          Keyboard.dismiss();
+          inputRef.current?.blur();
+        }}
+      >
+        {clusters.map((group, index) => {
+          const first = group[0];
+
+          if (group.length === 1) {
+            return (
+              <Marker
+                key={first.id}
+                coordinate={{
+                  latitude: first.latitude,
+                  longitude: first.longitude,
+                }}
+                onPress={() => focusOnStation(first)}
+                tracksViewChanges={false}
+              >
+                <Icon
+                  name="ev-station"
+                  size={30}
+                  color={first.available_ports > 0 ? 'green' : 'red'}
+                />
+              </Marker>
+            );
+          }
+
+          const hasAvailable = group.some(s => s.available_ports > 0);
+
+          const avgLat =
+            group.reduce((sum, s) => sum + s.latitude, 0) / group.length;
+
+          const avgLng =
+            group.reduce((sum, s) => sum + s.longitude, 0) / group.length;
+
+          return (
+            <Marker
+              key={`cluster-${index}`}
+              coordinate={{ latitude: avgLat, longitude: avgLng }}
+              tracksViewChanges={false}
+              onPress={() => {
+                mapRef.current?.animateToRegion({
+                  latitude: avgLat,
+                  longitude: avgLng,
+                  latitudeDelta: Math.max(region.latitudeDelta / 2, 0.02),
+                  longitudeDelta: Math.max(region.longitudeDelta / 2, 0.02),
+                });
+              }}
+            >
+              <View style={styles.clusterOuter}>
+                <View
+                  style={[
+                    styles.clusterInner,
+                    {
+                      backgroundColor: hasAvailable ? '#15743c' : '#e74c3c',
+                    },
+                  ]}
+                >
+                  <Icon name="ev-station" size={16} color="white" />
+                  <Text style={styles.clusterText}>{group.length}</Text>
+                </View>
+              </View>
+            </Marker>
+          );
+        })}
+      </MapView>
+
+      {selectedStation && (
+        <StationPopup
+          station={selectedStation}
+          onClose={resetUI}
+          onRefresh={init}
+          navigation={navigation}
+        />
+      )}
+
+      <FilterModal
+        visible={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApply={applyFilter}
+      />
+
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+
+  topBarContainer: {
+    paddingTop: 5,
+    paddingHorizontal: 15,
+    backgroundColor: 'white',
+    zIndex: 10,
+    height: 60,
+    justifyContent: 'center',
+  },
+
+  searchWrapper: {
+    position: 'absolute',
+    top: 90,
+    left: 15,
+    right: 15,
+    zIndex: 20,
+  },
+
+  map: { flex: 1 },
+
+  suggestionBox: {
+    backgroundColor: 'white',
+    marginTop: 1,
+    borderRadius: 5,
+    elevation: 10,
+  },
+
+  suggestionItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc2c2',
+  },
+
+  clusterOuter: {
+    backgroundColor: 'rgba(21, 116, 60, 0.25)', // consistent dark green glow
+    borderRadius: 30,
+    padding: 6,
+  },
+
+  clusterInner: {
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+  },
+
+  clusterText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+});
