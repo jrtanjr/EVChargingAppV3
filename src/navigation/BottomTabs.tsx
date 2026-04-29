@@ -5,9 +5,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import MapStack from './MapStack';
 import FavouriteScreen from '../screens/favourite/FavouriteScreen';
-import ScanScreen from '../screens/ScanScreen';
-import StationsScreen from '../screens/StationsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ScanScreen from '../screens/scan/ScanScreen';
+import StationsScreen from '../screens/stations/StationsScreen';
+import ProfileScreen from '../screens/profile/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 

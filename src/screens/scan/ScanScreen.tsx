@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, Button } from 'react-native';
 
-import {  getStations } from '../services/database/stationService';
+import {  getStations } from '../../services/database/stationService';
 
 export default function MapScreen() {
 

@@ -5,20 +5,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
 
 import { getStations, getConnectorsByStation } from '../../services/database/stationService';
-import { getFavourites, toggleFavourite } from '../../services/storage/favouriteService';
+import { toggleFavourite, getFavourites } from '../../services/storage/favouriteService';
 import SearchBar from '../../components/map/SearchBar';
 import { getDistanceKm } from '../../services/api/apiService';
 
-
-export default function FavouriteScreen({ navigation }: any) {
+export default function StationsScreen({ navigation }: any) {
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [userLocation, setUserLocation] = useState<any>(null);
   const [connectorsMap, setConnectorsMap] = useState<any>({});
+  const [favIds, setFavIds] = useState<number[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
-      loadFavourites();
+      loadStations();
     }, [])
   );
 
@@ -45,20 +45,16 @@ export default function FavouriteScreen({ navigation }: any) {
     getLocation();
   }, []);
 
-  const loadFavourites = async () => {
-    const favIds = await getFavourites();
+  const loadStations = async () => {
     const stations = await getStations();
+    const fav = await getFavourites();
 
-    const favStations = stations.filter((s) =>
-      favIds.includes(Number(s.id))
-    );
+    setData(stations);
+    setFavIds(fav);
 
-    setData(favStations);
-
-    // load connectors info
+    // load connectors
     const map: any = {};
-
-    for (const station of favStations) {
+    for (const station of stations) {
       const connectors = await getConnectorsByStation(station.id);
       map[station.id] = connectors;
     }
@@ -69,7 +65,11 @@ export default function FavouriteScreen({ navigation }: any) {
   const handleToggleFavourite = async (id: number) => {
     await toggleFavourite(id);
 
-    setData((prev) => prev.filter((item) => item.id !== id));
+    setFavIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((i) => i !== id)
+        : [...prev, id]
+    );
   };
 
   // ================= FILTER =================
@@ -80,6 +80,7 @@ export default function FavouriteScreen({ navigation }: any) {
   // ================= RENDER =================
   const renderItem = ({ item }: any) => {
     const isAvailable = item.available_ports > 0;
+    const isFav = favIds.includes(item.id);
 
     const distance = userLocation
       ? getDistanceKm(
@@ -90,7 +91,6 @@ export default function FavouriteScreen({ navigation }: any) {
         )
       : null;
 
-    // ================= CONNECTORS =================
     const connectors = connectorsMap[item.id] || [];
 
     const ac = connectors.filter((c: any) =>
@@ -130,25 +130,27 @@ export default function FavouriteScreen({ navigation }: any) {
             style={styles.starBtn}
             onPress={() => handleToggleFavourite(item.id)}
           >
-            <Icon name="star" size={25} color="#facc15" />
+            <Icon
+              name={isFav ? 'star' : 'star-outline'}
+              size={25}
+              color="#facc15"
+            />
           </TouchableOpacity>
         </View>
 
         {/* INNER BOX */}
         <View style={styles.innerBox}>
           <Text style={styles.address}>
-            {item.address || 'No address'}
+            {item.address}
           </Text>
 
           {/* AC */}
           {acTotal > 0 && (
             <View style={styles.infoRow}>
               <Icon name="power-plug" size={18} color="#3b82f6" />
-
               <Text style={styles.infoText}>
                 AC • {acPower} kW
               </Text>
-
               <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
                 <Text style={styles.badgeText}>
                   {acAvailable}/{acTotal}
@@ -161,11 +163,9 @@ export default function FavouriteScreen({ navigation }: any) {
           {dcTotal > 0 && (
             <View style={styles.infoRow}>
               <Icon name="flash" size={18} color="#f97316" />
-
               <Text style={styles.infoText}>
                 DC • {dcPower} kW
               </Text>
-
               <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
                 <Text style={styles.badgeText}>
                   {dcAvailable}/{dcTotal}
@@ -174,7 +174,7 @@ export default function FavouriteScreen({ navigation }: any) {
             </View>
           )}
 
-          {/* 📍 Distance */}
+          {/* DISTANCE */}
           {distance && (
             <Text style={styles.distance}>
               📍 {distance.toFixed(1)} km away
@@ -200,30 +200,22 @@ export default function FavouriteScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
 
-      {/* 🔍 SEARCH */}
+      {/* SEARCH */}
       <View style={styles.header}>
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder="Search favourites ev stations..."
+          placeholder="Search EV stations..."
           showFilter={false}
         />
       </View>
 
-      {/* 📋 LIST */}
+      {/* LIST */}
       <FlatList
         data={filteredData}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 15 }}
-
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              No favourite stations yet
-            </Text>
-          </View>
-        }
       />
 
     </View>
@@ -240,20 +232,28 @@ const styles = StyleSheet.create({
     padding: 15,
   },
 
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  
-  starBtn: {
-    paddingTop: 2,
-  },
-  
   card: {
     backgroundColor: '#1f2937',
     borderRadius: 14,
     padding: 16,
     marginBottom: 14,
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+
+  name: {
+    flex: 1,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginRight: 8,
+  },
+
+  starBtn: {
+    paddingTop: 2,
   },
 
   innerBox: {
@@ -265,42 +265,10 @@ const styles = StyleSheet.create({
     borderLeftColor: '#22c55e',
   },
 
-  name: {
-    flex: 1,
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginRight: 8,
-  },
-
   address: {
     color: '#ffffff',
     marginBottom: 8,
-    fontSize: 14,
     fontWeight: 'bold',
-  },
-
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
-  text: {
-    color: '#e5e7eb',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-
-  status: {
-    color: '#22c55e',
-    fontWeight: 'bold',
-  },
-
-  distance: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 6,
   },
 
   infoRow: {
@@ -329,14 +297,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  emptyContainer: {
-    marginTop: 40,
-    alignItems: 'center',
+  distance: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    marginBottom: 6,
   },
 
-  emptyText: {
-    color: '#ffffff',
-    fontSize: 20,
+  status: {
     fontWeight: 'bold',
   },
 });

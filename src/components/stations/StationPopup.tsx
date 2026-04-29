@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking  } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { toggleFavourite, isFavouriteStation } from '../../services/storage/favouriteService';
@@ -32,6 +32,11 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
   const handleToggleFavourite = async () => {
     await toggleFavourite(station.id);
     setIsFavourite(prev => !prev);
+  };
+
+  const handleGetDirection = () => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`;
+    Linking.openURL(url);
   };
 
   // ================= DISTANCE =================
@@ -68,6 +73,7 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
   const dcPower = dc.length > 0 ? Math.max(...dc.map(c => c.power_kw || 0)) : 0;
   
 
+
   return (
     <View style={styles.popup}>
 
@@ -80,7 +86,7 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
         <TouchableOpacity onPress={handleToggleFavourite}>
           <Icon
             name={isFavourite ? 'star' : 'star-outline'}
-            size={22}
+            size={25}
             color="#facc15"
           />
         </TouchableOpacity>
@@ -92,13 +98,6 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
         <Text style={styles.address}>
           {station.address}
         </Text>
-
-        {/* 📍 Distance */}
-        {distanceLabel && (
-          <Text style={styles.distance}>
-            📍 {distanceLabel}
-          </Text>
-        )}
 
         {/* AC */}
         {acTotal > 0 && (
@@ -134,30 +133,51 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
           </View>
         )}
 
+        {/* 📍 Distance */}
+        {distanceLabel && (
+          <Text style={styles.distance}>
+            📍 {distanceLabel}
+          </Text>
+        )}
+
       </View>
 
       {/* BUTTON */}
-      {station.available_ports > 0 ? (
+      <View style={styles.buttonRow}>
+
+        {/* Direction Button */}
         <TouchableOpacity
-          style={styles.startButton}
-          onPress={async () => {
-            const connectors = await getConnectorsByStation(station.id);
-
-            onClose();
-
-            navigation.navigate('PaymentSelection', {
-              station,
-              connectors,
-            });
-          }}
+          style={styles.directionBtn}
+          onPress={handleGetDirection}
         >
-          <Text style={styles.startButtonText}>Start Charging</Text>
+          <Icon name="map-marker-path" size={18} color="white" />
+          <Text style={styles.directionText}>Direction</Text>
         </TouchableOpacity>
-      ) : (
-        <View style={styles.disabledButton}>
-          <Text style={styles.disabledText}>Station Fully Occupied</Text>
-        </View>
-      )}
+
+        {/* Start Charging */}
+        {station.available_ports > 0 ? (
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={async () => {
+              const connectors = await getConnectorsByStation(station.id);
+
+              onClose();
+
+              navigation.navigate('PaymentSelection', {
+                station,
+                connectors,
+              });
+            }}
+          >
+            <Text style={styles.startButtonText}>Start Charging</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.disabledButton}>
+            <Text style={styles.disabledText}>Station Fully Occupied</Text>
+          </View>
+        )}
+
+      </View>
 
     </View>
   );
@@ -166,101 +186,124 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
 const styles = StyleSheet.create({
 
   popup: {
-  position: 'absolute',
-  bottom: 40,
-  left: 20,
-  right: 20,
-  backgroundColor: '#1f2937',
-  borderRadius: 14,
-  padding: 16,
-},
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
+    backgroundColor: '#1f2937',
+    borderRadius: 14,
+    padding: 16,
+  },
 
-headerRow: {
-  flexDirection: 'row',
-  alignItems: 'flex-start',
-},
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
 
-title: {
-  flex: 1,
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: 16,
-},
+  title: {
+    flex: 1,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 
-innerBox: {
-  marginTop: 12,
-  backgroundColor: '#111827',
-  padding: 14,
-  borderRadius: 10,
-  borderLeftWidth: 3,
-  borderLeftColor: '#22c55e',
-},
+  innerBox: {
+    marginTop: 12,
+    backgroundColor: '#111827',
+    padding: 14,
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#22c55e',
+  },
 
-address: {
-  color: '#ffffff',
-  marginBottom: 8,
-  fontSize: 14,
-  fontWeight: 'bold',
-},
+  address: {
+    color: '#ffffff',
+    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 
-distance: {
-  color: '#ffffff',
-  fontSize: 14,
-  fontWeight: 'bold',
-  marginBottom: 6,
-},
+  distance: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 6,
+  },
 
-infoRow: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: 8,
-},
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
 
-infoText: {
-  flex: 1,
-  marginLeft: 8,
-  color: '#e5e7eb',
-  fontWeight: 'bold',
-},
+  infoText: {
+    flex: 1,
+    marginLeft: 8,
+    color: '#e5e7eb',
+    fontWeight: 'bold',
+  },
 
-badge: {
-  paddingHorizontal: 10,
-  paddingVertical: 4,
-  borderRadius: 12,
-},
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
 
-badgeText: {
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: 12,
-},
+  badgeText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
 
-startButton: {
-  marginTop: 12,
-  backgroundColor: '#15743c',
-  padding: 12,
-  borderRadius: 10,
-  alignItems: 'center',
-},
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
 
-startButtonText: {
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: 16,
-},
+  directionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3b82f6',
+    padding: 10,
+    borderRadius: 10,
+    marginRight: 10,
+  },
 
-disabledButton: {
-  marginTop: 12,
-  backgroundColor: '#374151',
-  padding: 12,
-  borderRadius: 10,
-  alignItems: 'center',
-},
+  directionText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginLeft: 6,
+  },
 
-disabledText: {
-  color: '#9ca3af',
-  fontWeight: 'bold',
-},
+  startButton: {
+    flex: 1,
+    backgroundColor: '#15743c',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  disabledButton: {
+    flex: 1,
+    backgroundColor: '#374151',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  startButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  disabledText: {
+    color: '#9ca3af',
+    fontWeight: 'bold',
+  },
   
 });
