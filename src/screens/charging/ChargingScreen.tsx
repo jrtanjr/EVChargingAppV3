@@ -359,7 +359,7 @@ export default function ChargingScreen({ route, navigation }: any) {
           {hasDisconnected && !isFull && (
             <>
               <Text style={styles.warning}>
-                Charger disconnected — idle fees may apply ⚠️
+                Charger stopped — idle fees may apply ⚠️
               </Text>
 
               <Text style={styles.idle}>
@@ -512,11 +512,15 @@ const styles = StyleSheet.create({
   warning: {
     color: '#f87171',
     marginTop: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   idle: {
     color: 'white',
     marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   startBtn: {

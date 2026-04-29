@@ -1,13 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Animated,
-} from 'react-native';
-
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { getBalance } from '../../services/storage/walletService';
 import { getCard } from '../../services/storage/cardService';
 
@@ -40,9 +33,11 @@ export default function PaymentSelectionScreen({ route, navigation }: any) {
     ]).start();
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useFocusEffect(
+      React.useCallback(() => {
+        load();
+      }, [])
+    );
 
   const load = async () => {
     const b = await getBalance();
