@@ -4,17 +4,18 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { toggleFavourite, isFavouriteStation } from '../../services/storage/favouriteService';
 import { getConnectorsByStation } from '../../services/database/stationService';
+import { getDistanceKm } from '../../services/api/apiService';
 
-export default function StationPopup({ station, onClose, navigation }: any) {
+export default function StationPopup({ station, userLocation, onClose, navigation }: any) {
   const [connectors, setConnectors] = useState<any[]>([]);
   const [isFavourite, setIsFavourite] = useState(false);
 
   useEffect(() => {
     loadConnectors();
-    loadFavourite(); 
+    loadFavourite();
   }, [station.id]);
 
-  const loadFavourite = async () => { // check if station is favourite
+  const loadFavourite = async () => {
     const result = await isFavouriteStation(station.id);
     setIsFavourite(result);
   };
@@ -30,59 +31,73 @@ export default function StationPopup({ station, onClose, navigation }: any) {
 
   const handleToggleFavourite = async () => {
     await toggleFavourite(station.id);
-    setIsFavourite(prev => !prev); // instant UI update
+    setIsFavourite(prev => !prev);
   };
 
-  // AC Connectors
+  // ================= DISTANCE =================
+  const distance = userLocation
+    ? getDistanceKm(
+        userLocation.latitude,
+        userLocation.longitude,
+        station.latitude,
+        station.longitude
+      )
+    : null;
+
+  const distanceLabel = distance
+    ? distance < 1
+      ? 'Very close'
+      : `${distance.toFixed(1)} km away`
+    : null;
+
+  // ================= CONNECTORS =================
   const ac = connectors.filter(c =>
     c.current_type?.toUpperCase().includes('AC')
   );
 
-  const acTotal = ac.reduce((sum, c) => sum + c.quantity, 0);
-
-  const acAvailable = ac.reduce((sum, c) => sum + c.available, 0);
-
-  const acPower =
-    ac.length > 0 ? Math.max(...ac.map(c => c.power_kw || 0)) : 0;
-
-  // DC Connectors
   const dc = connectors.filter(c =>
     c.current_type?.toUpperCase().includes('DC')
   );
 
+  const acTotal = ac.reduce((sum, c) => sum + c.quantity, 0);
+  const acAvailable = ac.reduce((sum, c) => sum + c.available, 0);
+  const acPower = ac.length > 0 ? Math.max(...ac.map(c => c.power_kw || 0)) : 0;
+
   const dcTotal = dc.reduce((sum, c) => sum + c.quantity, 0);
-
   const dcAvailable = dc.reduce((sum, c) => sum + c.available, 0);
-
-  const dcPower =
-    dc.length > 0 ? Math.max(...dc.map(c => c.power_kw || 0)) : 0;
-
+  const dcPower = dc.length > 0 ? Math.max(...dc.map(c => c.power_kw || 0)) : 0;
   
 
   return (
+    
     <View style={styles.popup}>
+      
+      {/* HEADER */}
       <View style={styles.header}>
-      <Text 
-        style={styles.title}
-        numberOfLines={2}
-        ellipsizeMode='tail'
-      >
-        {station.name}
-      </Text>
-      <Text style={styles.address}>
-        {station.address}
-      </Text>
-    </View>
+        <Text style={styles.title} numberOfLines={2}>
+          {station.name}
+        </Text>
 
-      {/* AC Info */}
+        <Text style={styles.address}>
+          {station.address}
+        </Text>
+
+
+        {/* 📍 Distance */}
+        {distanceLabel && (
+          <Text style={styles.distance}>
+            📍 {distanceLabel}
+          </Text>
+        )}
+      </View>
+
+      {/* AC */}
       {acTotal > 0 && (
         <View style={styles.infoRow}>
           <Icon name="power-plug" size={18} color="#3b82f6" />
-
           <Text style={styles.infoText}>
             AC • {acPower} kW
           </Text>
-
           <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
             <Text style={styles.badgeText}>
               {acAvailable} / {acTotal}
@@ -91,15 +106,13 @@ export default function StationPopup({ station, onClose, navigation }: any) {
         </View>
       )}
 
-      {/* DC Info */}
+      {/* DC */}
       {dcTotal > 0 && (
         <View style={styles.infoRow}>
           <Icon name="flash" size={18} color="#f97316" />
-
           <Text style={styles.infoText}>
             DC • {dcPower} kW
           </Text>
-
           <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
             <Text style={styles.badgeText}>
               {dcAvailable} / {dcTotal}
@@ -108,7 +121,7 @@ export default function StationPopup({ station, onClose, navigation }: any) {
         </View>
       )}
 
-      {/* Favourite Button */}
+      {/* Favourite */}
       <TouchableOpacity
         style={styles.favButton}
         onPress={handleToggleFavourite}
@@ -116,20 +129,20 @@ export default function StationPopup({ station, onClose, navigation }: any) {
         <Icon
           name={isFavourite ? 'star' : 'star-outline'}
           size={30}
-          color="#f1c40f"
+          color="#facc15"
         />
       </TouchableOpacity>
 
-      {/* Charge Button */}
-      {station.available_ports > 0 ? ( // only show if has available ports
+      {/* Button */}
+      {station.available_ports > 0 ? (
         <TouchableOpacity
           style={styles.startButton}
-          onPress={async () => { 
+          onPress={async () => {
             const connectors = await getConnectorsByStation(station.id);
 
             onClose();
 
-            navigation.navigate('PaymentSelection', { 
+            navigation.navigate('PaymentSelection', {
               station,
               connectors,
             });
@@ -142,6 +155,7 @@ export default function StationPopup({ station, onClose, navigation }: any) {
           <Text style={styles.disabledText}>Station Fully Occupied</Text>
         </View>
       )}
+
     </View>
   );
 }
@@ -232,5 +246,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+
+  distance: {
+    color: '#6b7280',
+    fontSize: 12,
+    marginBottom: 8,
   },
 });

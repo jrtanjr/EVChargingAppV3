@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, StyleSheet, Text, Keyboard, TextInput } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Geolocation from 'react-native-geolocation-service';
 
 import TopBar from '../../components/map/TopBar';
 import StationPopup from '../../components/stations/StationPopup';
@@ -42,9 +43,11 @@ export default function MapScreen({ navigation }: any) {
 
   const inputRef = useRef<TextInput>(null);
   const mapRef = useRef<MapView | null>(null);
+  const [userLocation, setUserLocation] = useState<any>(null);
 
   useEffect(() => {
     init();
+    getUserLocation();
   }, []);
 
   const init = async () => {
@@ -69,6 +72,42 @@ export default function MapScreen({ navigation }: any) {
       console.log('LOAD ERROR:', error);
     }
   };
+
+  // ==============================
+  // GET USER LOCATION
+  // ==============================
+  const getUserLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+
+        console.log('USER LOCATION:', coords); // debug
+
+        setUserLocation(coords);
+
+        // Optional: center map to user
+        mapRef.current?.animateToRegion(
+          {
+            ...coords,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+          500
+        );
+      },
+      (error) => {
+        console.log('LOCATION ERROR:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      }
+    );
+  }; 
 
   // ==============================
   // SEARCH
@@ -323,6 +362,7 @@ export default function MapScreen({ navigation }: any) {
       {selectedStation && (
         <StationPopup
           station={selectedStation}
+          userLocation={userLocation}
           onClose={resetUI}
           onRefresh={init}
           navigation={navigation}

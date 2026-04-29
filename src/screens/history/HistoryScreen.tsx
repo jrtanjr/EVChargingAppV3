@@ -150,7 +150,7 @@ export default function HistoryScreen() {
             <SearchBar
               value={search}
               onChange={setSearch}
-              placeholder="Search history..."
+              placeholder="Search charging history..."
               showFilter={false}
             />
           </View>
