@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, ScrollView, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const FAQS = [
@@ -35,12 +35,10 @@ export default function HelpScreen() {
   const [showSupport, setShowSupport] = useState(false);
 
   const toggle = (index: number) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setActiveIndex(activeIndex === index ? null : index);
   };
 
   const toggleSupport = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setShowSupport(!showSupport);
   };
 

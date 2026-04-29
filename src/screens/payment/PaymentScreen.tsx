@@ -399,7 +399,7 @@ export default function PaymentScreen({ navigation }: any) {
                     setShowDateFilter(false)
                   }}
                 >
-                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>Apply</Text>
+                  <Text style={styles.applyText}>Apply</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -411,7 +411,7 @@ export default function PaymentScreen({ navigation }: any) {
 
                   }}
                 >
-                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>Clear</Text>
+                  <Text style={styles.clearText}>Clear</Text>
                 </TouchableOpacity>
               </View>
 
@@ -431,11 +431,11 @@ export default function PaymentScreen({ navigation }: any) {
               if (date) {
                 setTempStartDate(date);
 
-                //adjust end date if earlier than start date (invalid)
-                 if (tempEndDate && date > tempEndDate) {
-                    setTempEndDate(date);
-                 }
+                
+                if (tempEndDate && date > tempEndDate) {
+                  setTempEndDate(date);
                 }
+              }
             }}
           />
         )}
@@ -445,15 +445,12 @@ export default function PaymentScreen({ navigation }: any) {
             value={tempEndDate || new Date()}
             mode="date"
             display="default"
+            minimumDate={tempStartDate || undefined} // ✅ prevents invalid selection
             onChange={(event, date) => {
               setShowEndPicker(false);
 
               if (date) {
-                if (tempStartDate && date < tempStartDate) { //adjust end date if earlier than start date (invalid)
-                    setTempEndDate(tempStartDate);
-                  } else {
-                  setTempEndDate(date);
-                }
+                setTempEndDate(date); // ✅ no need for extra validation
               }
             }}
           />
@@ -466,7 +463,7 @@ export default function PaymentScreen({ navigation }: any) {
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 50 }}
         ListEmptyComponent={
-          <Text style={{ textAlign: 'center', marginTop: 20 }}>
+          <Text style={styles.emptyTxText}>
             No transactions yet
           </Text>
         }
@@ -492,7 +489,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     padding: 20,
     borderRadius: 12,
-    marginBottom: 20,
+    marginBottom: 8,
   },
 
   label: {
@@ -566,7 +563,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 2,
   },
 
   filterRow: {
@@ -586,9 +583,10 @@ const styles = StyleSheet.create({
   },
 
   calendarBtn: {
-    padding: 6,
-    backgroundColor: '#000000v',
+    padding: 8,
+    backgroundColor: '#000000',
     borderRadius: 8,
+    marginBottom: 5,
   },
 
   datePanel: {
@@ -617,10 +615,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
+  applyText: {
+    color: 'white', 
+    fontWeight: 'bold', 
+    fontSize: 14,
+  },
+
   clearBtn: {
     backgroundColor: '#ef4444',
     padding: 10,
     borderRadius: 8,
+  },
+
+  clearText: {
+    color: 'white', 
+    fontWeight: 'bold', 
+    fontSize: 14,
   },
 
   addCardBtn: {
@@ -700,6 +710,14 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 
+  emptyTxText: {
+    color: 'white', 
+    textAlign: 'center', 
+    marginTop: 20,
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+
   txCard: {
     backgroundColor: '#000000',
     padding: 12,
@@ -730,18 +748,18 @@ const styles = StyleSheet.create({
   txMethod: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
 
   txSub: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   
   txDate: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#c4cbd6',
   },
 

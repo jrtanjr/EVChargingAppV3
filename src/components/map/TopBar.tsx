@@ -10,7 +10,7 @@ export default function TopBar({ navigation }: any) {
         <Icon name="menu" size={24} />
       </TouchableOpacity>
 
-      <Text style={styles.title}>EV Charging</Text>
+      <Text style={styles.title}>EZChargeEV App</Text>
 
       <TouchableOpacity>
         <Icon name="bell-outline" size={26} />

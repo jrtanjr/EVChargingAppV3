@@ -2,7 +2,9 @@ import React from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function SearchBar({ value, onChange, onFilterPress }: any) {
+export default function SearchBar({ value, onChange, onFilterPress, 
+  placeholder = 'Search...', showFilter = true }: any) {
+
   return (
     <View style={styles.container}>
 
@@ -11,7 +13,7 @@ export default function SearchBar({ value, onChange, onFilterPress }: any) {
 
       {/* INPUT */}
       <TextInput
-        placeholder="Search EV stations..."
+        placeholder={placeholder}
         placeholderTextColor="#9ca3af"
         value={value}
         onChangeText={onChange}
@@ -26,9 +28,11 @@ export default function SearchBar({ value, onChange, onFilterPress }: any) {
       )}
 
       {/* ⚙️ Filter Button */}
-      <TouchableOpacity onPress={onFilterPress} style={styles.filterBtn}>
-        <Icon name="tune" size={20} color="white" />
-      </TouchableOpacity>
+      {showFilter && (
+        <TouchableOpacity onPress={onFilterPress} style={styles.filterBtn}>
+          <Icon name="tune" size={20} color="white" />
+        </TouchableOpacity>
+      )}
 
     </View>
   );
@@ -43,9 +47,6 @@ const styles = StyleSheet.create({
   paddingHorizontal: 12,
   paddingVertical: 8,
 
-  shadowColor: '#000',
-  shadowOpacity: 0.2,
-  shadowRadius: 6,
   elevation: 4,
 },
 

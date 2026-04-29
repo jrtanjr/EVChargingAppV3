@@ -1,13 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, LayoutAnimation, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const TERMS = [
   {
     title: 'General Use',
     content:
-      'By using this EV Charging App, you agree to comply with all applicable laws and regulations. The app provides charging station information and simulation services.',
+      'By using this EZChargeEV App, you agree to comply with all applicable laws and regulations. The app provides charging station information and simulation services.',
   },
   {
     title: 'Charging Sessions',
@@ -40,8 +40,6 @@ export default function TermsScreen() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const toggle = (index: number) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
     setActiveIndex(activeIndex === index ? null : index);
   };
 
