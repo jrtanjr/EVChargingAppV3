@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { insertChargingHistory } from '../../services/database/chargingService';
 import { insertPayment } from '../../services/database/paymentService';
 import { getBalance, setBalance } from '../../services/storage/walletService';
+import { getCard } from '../../services/storage/cardService';
 
 export default function ChargingScreen({ route, navigation }: any) {
   const { station, connectors, paymentMethod, budget, cardLast4 } = route.params;
@@ -153,11 +154,14 @@ export default function ChargingScreen({ route, navigation }: any) {
           await setBalance(walletBalance);
         }
 
+        const card = await getCard();
+
         await insertPayment({
           charging_id: Date.now(),
           amount: totalCost,
           method: 'card',
           status: 'paid',
+          card_last4: card?.last4 || null,
         });
 
       } else {
@@ -174,6 +178,7 @@ export default function ChargingScreen({ route, navigation }: any) {
           amount: totalCost,
           method: 'wallet',
           status: 'paid',
+          card_last4: null,
         });
       }
 

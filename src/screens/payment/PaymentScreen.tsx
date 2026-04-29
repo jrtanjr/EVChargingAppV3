@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Pressable, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Pressable, Animated, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -53,6 +53,20 @@ export default function PaymentScreen({ navigation }: any) {
   // TOP UP FUNCTION
   // ==============================
   const handleTopUp = async (amount: number) => {
+    if (!card) {
+      Alert.alert(
+        'No Card Linked',
+        'You need to add a card before topping up your wallet.',
+        [
+          {
+            text: 'Add Card',
+            onPress: () => navigation.navigate('AddCard'),
+          },
+          { text: 'Cancel', style: 'cancel' },
+        ]
+      );
+      return;
+    }
     const newBalance = await topUp(amount);
 
     // Save transaction
@@ -60,6 +74,7 @@ export default function PaymentScreen({ navigation }: any) {
       amount,
       method: 'topup',
       status: 'success',
+      card_last4: card.last4,
     });
 
     setBalance(newBalance);
@@ -147,7 +162,11 @@ export default function PaymentScreen({ navigation }: any) {
 
         {/* SUB INFO */}
         <Text style={styles.txSub}>
-          Method: {item.method.toUpperCase()}
+          {item.method === 'card'
+            ? `💳 •••• ${item.card_last4 || '----'}`
+            : item.method === 'topup'
+            ? `💰 Top Up •••• ${item.card_last4 || '----'}`
+            : '👛 Wallet'}
         </Text>
 
         <Text style={styles.txDate}>

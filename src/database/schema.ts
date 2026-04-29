@@ -62,6 +62,7 @@ export const createTables = async () => {
       amount REAL,
       method TEXT,
       status TEXT,
+      card_last4 TEXT,
       timestamp TEXT,
       is_synced INTEGER DEFAULT 0
     );
