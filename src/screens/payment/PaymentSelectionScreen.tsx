@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   },
 
   amountSelected: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#15743c',
   },
 
   amountText: {
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
 
   startBtn: {
     marginTop: 25,
-    backgroundColor: '#058f38',
+    backgroundColor: '#15743c',
     padding: 16,
     borderRadius: 14,
     alignItems: 'center',

@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   // ================= SUPPORT =================
   supportBtn: {
     marginTop: 20,
-    backgroundColor: '#22c55e',
+    backgroundColor: '#15743c',
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',

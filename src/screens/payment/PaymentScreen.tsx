@@ -143,22 +143,22 @@ export default function PaymentScreen({ navigation }: any) {
 
   return (
     <View style={styles.txCard}>
+       <View style={styles.txInner}>
+        {/* HEADER ROW */}
+          <View style={styles.txRow}>
+            <Text style={styles.txMethod}>
+              {isTopUp ? 'Balance Top Up' : 'Charging Payment'}
+            </Text>
 
-      {/* HEADER ROW */}
-        <View style={styles.txRow}>
-          <Text style={styles.txMethod}>
-            {isTopUp ? 'Balance Top Up' : 'Charging Payment'}
-          </Text>
-
-          <Text
-            style={[
-              styles.txAmount,
-              { color: isTopUp ? '#22c55e' : '#ef4444' },
-            ]}
-          >
-            {isTopUp ? '+' : '-'} RM {item.amount.toFixed(2)}
-          </Text>
-        </View>
+            <Text
+              style={[
+                styles.txAmount,
+                { color: isTopUp ? '#22c55e' : '#ef4444' },
+              ]}
+            >
+              {isTopUp ? '+' : '-'} RM {item.amount.toFixed(2)}
+            </Text>
+          </View>
 
         {/* SUB INFO */}
         <Text style={styles.txSub}>
@@ -174,6 +174,7 @@ export default function PaymentScreen({ navigation }: any) {
         </Text>
 
       </View>
+    </View>
     );
   };
 
@@ -375,7 +376,7 @@ export default function PaymentScreen({ navigation }: any) {
                 style={styles.dateBtn}
                 onPress={() => setShowStartPicker(true)}
               >
-                <Text style={{ color: '#222222', fontWeight: 'bold', fontSize: 14 }}>
+                <Text style={{ color: '#1f2937', fontWeight: 'bold', fontSize: 14 }}>
                   From: {tempStartDate ? tempStartDate.toDateString() : ' Select Start Date'}
                 </Text>
               </TouchableOpacity>
@@ -384,7 +385,7 @@ export default function PaymentScreen({ navigation }: any) {
                 style={styles.dateBtn}
                 onPress={() => setShowEndPicker(true)}
               >
-                <Text style={{ color: '#222222', fontWeight: 'bold', fontSize: 14 }}>
+                <Text style={{ color: '#1f2937', fontWeight: 'bold', fontSize: 14 }}>
                   To: {tempEndDate ? tempEndDate.toDateString() : ' Select End Date'}
                 </Text>
               </TouchableOpacity>
@@ -483,12 +484,12 @@ export default function PaymentScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f7fa',
+    backgroundColor: '#1f2937',
     padding: 15,
   },
 
   card: {
-    backgroundColor: '#222222',
+    backgroundColor: '#000000',
     padding: 20,
     borderRadius: 12,
     marginBottom: 20,
@@ -532,7 +533,7 @@ const styles = StyleSheet.create({
   },
 
   topUpBtn: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#15743c',
     padding: 10,
     borderRadius: 20,
     borderWidth: 2,
@@ -576,22 +577,22 @@ const styles = StyleSheet.create({
   filterBtn: {
     padding: 8,
     marginRight: 10,
-    backgroundColor: '#222222',
+    backgroundColor: '#000000',
     borderRadius: 6,
   },
 
   activeFilter: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#15743c',
   },
 
   calendarBtn: {
     padding: 6,
-    backgroundColor: '#222222',
+    backgroundColor: '#000000v',
     borderRadius: 8,
   },
 
   datePanel: {
-    backgroundColor: '#222222',
+    backgroundColor: '#000000',
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
@@ -611,7 +612,7 @@ const styles = StyleSheet.create({
   },
 
   applyBtn: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#15743c',
     padding: 10,
     borderRadius: 8,
   },
@@ -636,13 +637,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  cardBox: {
-    backgroundColor: '#111827',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-
   cardText: {
     color: 'white',
     fontSize: 16,
@@ -655,7 +649,7 @@ const styles = StyleSheet.create({
   },
 
   cardPreviewMini: {
-    backgroundColor: '#1f2937',
+    backgroundColor: '#232a2c',
     borderRadius: 16,
     padding: 16,
     marginTop: 10,
@@ -707,13 +701,20 @@ const styles = StyleSheet.create({
   },
 
   txCard: {
-    backgroundColor: '#222222',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 12,
-    elevation: 20,
+    backgroundColor: '#000000',
+    padding: 12,
+    borderRadius: 14,
+    marginBottom: 2,
   },
 
+  txInner: {
+    backgroundColor: '#111827',
+    padding: 12,
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#22c55e',
+  },
+  
   txRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
