@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Pressable } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Pressable, Animated } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { getBalance, topUp } from '../../services/storage/walletService';
 import { getPayments, insertPayment } from '../../services/database/paymentService';
+import { getCard, removeCard } from '../../services/storage/cardService';
 
-export default function PaymentScreen() {
+export default function PaymentScreen({ navigation }: any) {
 
   //State
   const [balance, setBalance] = useState(0);
@@ -26,6 +27,10 @@ export default function PaymentScreen() {
   const [tempEndDate, setTempEndDate] = useState<Date | null>(null);
 
   const [showTopUpOptions, setShowTopUpOptions] = useState(false);
+  const [card, setCard] = useState<any>(null);
+
+  const topUpScale = useRef(new Animated.Value(1)).current;
+  const topUpExpand = useRef(new Animated.Value(0)).current;
   
 
   useFocusEffect(
@@ -37,9 +42,11 @@ export default function PaymentScreen() {
   const load = async () => {
     const b = await getBalance();
     const p = await getPayments();
+    const c = await getCard();
 
     setBalance(b);
     setPayments(p);
+    setCard(c);
   };
 
   // ==============================
@@ -64,6 +71,30 @@ export default function PaymentScreen() {
     setShowTopUpOptions(false);
   };
 
+  // top up animation
+  const animatePress = () => {
+    Animated.sequence([
+      Animated.timing(topUpScale, {
+        toValue: 0.95,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+      Animated.timing(topUpScale, {
+        toValue: 1,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const animateExpand = (show: boolean) => {
+    Animated.timing(topUpExpand, {
+      toValue: show ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+  
   // ==============================
   // FILTER LOGIC
   // ==============================
@@ -159,39 +190,117 @@ export default function PaymentScreen() {
 
         {/* TOP UP BUTTONS */}
         {!showTopUpOptions ? (
-          // 🔘 MAIN BUTTON
-          <TouchableOpacity
-            style={styles.topUpMainBtn}
-            onPress={() => setShowTopUpOptions(true)}
+          <Animated.View style={{ transform: [{ scale: topUpScale }] }}>
+            <TouchableOpacity
+              style={styles.topUpMainBtn}
+              onPress={() => {
+                animatePress();
+                setShowTopUpOptions(true);
+                animateExpand(true);
+              }}
+            >
+              <Text style={styles.topUpMainText}>Top Up</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        ) : (
+          <Animated.View
+            style={{
+              opacity: topUpExpand,
+              transform: [
+                {
+                  translateY: topUpExpand.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [10, 0],
+                  }),
+                },
+              ],
+            }}
           >
-            <Text style={styles.topUpMainText}>Top Up</Text>
+            <>
+              <View style={styles.topUpRow}>
+                {[10, 20, 50, 100].map((amt) => (
+                  <TouchableOpacity
+                    key={amt}
+                    style={styles.topUpBtn}
+                    onPress={() => handleTopUp(amt)}
+                  >
+                    <Text style={styles.topUpText}>+RM {amt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* CANCEL */}
+              <TouchableOpacity
+                onPress={() => {
+                  animatePress();
+                  animateExpand(false);
+                  setTimeout(() => setShowTopUpOptions(false), 200);
+                }}
+                style={styles.cancelBtn}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          </Animated.View>
+        )}
+      </View>
+
+      {/* ================= CARD ================= */}
+      <View style={styles.card}>
+        <Text style={styles.label}>Payment Method</Text>
+
+        {!card ? (
+          <TouchableOpacity
+            style={styles.addCardBtn}
+            onPress={() => navigation.navigate('AddCard')}
+          >
+            <Text style={styles.addCardText}>Add Card</Text>
           </TouchableOpacity>
         ) : (
-          // 💰 OPTIONS
-          <>
-            <View style={styles.topUpRow}>
-              {[10, 20, 50].map((amt) => (
-                <TouchableOpacity
-                  key={amt}
-                  style={styles.topUpBtn}
-                  onPress={() => handleTopUp(amt)}
-                >
-                  <Text style={styles.topUpText}>+RM {amt}</Text>
-                </TouchableOpacity>
-              ))}
+          <View style={styles.cardPreviewMini}>
+
+            {/* BRAND */}
+            <View style={styles.cardHeader}>
+              <Text style={styles.brandText}>
+                {card.number?.startsWith('4')
+                  ? 'VISA'
+                  : /^5[1-5]/.test(card.number || '')
+                  ? 'MASTERCARD'
+                  : 'CARD'}
+              </Text>
             </View>
 
-            {/* CANCEL BUTTON*/}
+            {/* NUMBER */}
+            <Text style={styles.cardNumber}>
+              **** **** **** {card.last4}
+            </Text>
+
+            {/* NAME + EXPIRY */}
+            <View style={styles.cardRow}>
+              <Text style={styles.cardName}>
+                {card.name || 'CARD HOLDER'}
+              </Text>
+
+              <Text style={styles.cardExpiry}>
+                {card.expiry || 'MM/YY'}
+              </Text>
+            </View>
+
+            {/* REMOVE */}
             <TouchableOpacity
-              onPress={() => setShowTopUpOptions(false)}
-              style={styles.cancelBtn}
+              onPress={async () => {
+                await removeCard();
+                load();
+              }}
             >
-              <Text style={styles.cancelText}>
-                Cancel
+              <Text style={styles.removeText}>
+                Remove Card
               </Text>
             </TouchableOpacity>
-          </>
+
+          </View>
         )}
+
       </View>
 
       {/* ================= FILTER HEADER ================= */}
@@ -492,6 +601,90 @@ const styles = StyleSheet.create({
     backgroundColor: '#ef4444',
     padding: 10,
     borderRadius: 8,
+  },
+
+  addCardBtn: {
+    backgroundColor: '#2563eb',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  addCardText: {
+    color: 'white', 
+    fontSize: 16, 
+    fontWeight: 'bold',
+  },
+
+  cardBox: {
+    backgroundColor: '#111827',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+
+  cardText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  cardSub: {
+    color: '#9ca3af',
+    fontSize: 12,
+  },
+
+  cardPreviewMini: {
+    backgroundColor: '#1f2937',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 10,
+  },
+
+  cardHeader: {
+    alignItems: 'flex-end',
+    marginBottom: 10,
+  },
+
+  brandText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+
+  cardNumber: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 3,
+    marginBottom: 10,
+  },
+
+  cardRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  cardName: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  cardExpiry: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  removeText: {
+    color: '#ef4444',
+    marginTop: 20,
+    marginBottom: -5,
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'right',
   },
 
   txCard: {

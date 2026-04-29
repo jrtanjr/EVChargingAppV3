@@ -7,7 +7,7 @@ import { insertPayment } from '../../services/database/paymentService';
 import { getBalance, setBalance } from '../../services/storage/walletService';
 
 export default function ChargingScreen({ route, navigation }: any) {
-  const { station, connectors, paymentMethod, budget } = route.params;
+  const { station, connectors, paymentMethod, budget, cardLast4 } = route.params;
 
   // ==============================
   // CONSTANTS
@@ -279,21 +279,17 @@ export default function ChargingScreen({ route, navigation }: any) {
           );
         })}
 
-            <View style={{
-              backgroundColor: '#1f2937',
-              padding: 15,
-              borderRadius: 10,
-              marginBottom: 10,
-              alignItems: 'center',
-            }}>
-              <Text style={{ color: '#9ca3af', fontSize: 16, fontWeight: 'bold', marginBottom: 5 }}>
-              Selected Payment Method
-            </Text>
+            <View style={styles.paymentBox}>
+              <Text style={styles.paymentLabel}>
+                Selected Payment Method
+              </Text>
 
-            <Text style={{ color: 'white', fontSize:16, fontWeight: 'bold' }}>
-              {paymentMethod === 'card' ? 'Credit Card' : 'Wallet'} (RM {budget})
-            </Text>
-          </View>
+              <Text style={styles.paymentValue}>
+                {paymentMethod === 'card'
+                   ? `Card •••• ${cardLast4} (Hold RM ${budget})`
+                   : `Wallet (RM ${budget})`}
+              </Text>
+            </View>
 
         </View>
 
@@ -624,5 +620,25 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
+  paymentBox: {
+    backgroundColor: '#1f2937',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
 
+  paymentLabel: {
+    color: '#9ca3af',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+
+  paymentValue: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  
 });
