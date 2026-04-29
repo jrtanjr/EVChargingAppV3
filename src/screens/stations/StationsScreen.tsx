@@ -9,12 +9,17 @@ import { toggleFavourite, getFavourites } from '../../services/storage/favourite
 import SearchBar from '../../components/map/SearchBar';
 import { getDistanceKm } from '../../services/api/apiService';
 
+import FilterModal from '../../components/map/FilterModal';
+
+
 export default function StationsScreen({ navigation }: any) {
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [userLocation, setUserLocation] = useState<any>(null);
   const [connectorsMap, setConnectorsMap] = useState<any>({});
   const [favIds, setFavIds] = useState<number[]>([]);
+  const [showFilter, setShowFilter] = useState(false);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -51,6 +56,7 @@ export default function StationsScreen({ navigation }: any) {
 
     setData(stations);
     setFavIds(fav);
+    setFilteredData(stations);
 
     // load connectors
     const map: any = {};
@@ -73,9 +79,47 @@ export default function StationsScreen({ navigation }: any) {
   };
 
   // ================= FILTER =================
-  const filteredData = data.filter((item) =>
-    item.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    if (!search) {
+      setFilteredData(data);
+      return;
+    }
+
+    const result = data.filter((item) =>
+      item.name?.toLowerCase().includes(search.toLowerCase())
+    );
+
+    setFilteredData(result);
+  }, [search, data]);
+
+  const applyFilter = async (filter: any) => {
+    if (filter.type === 'ALL') {
+      setFilteredData(data);
+      setShowFilter(false);
+      return;
+    }
+
+    const results = await Promise.all(
+      data.map(async (station) => {
+        const connectors = await getConnectorsByStation(station.id);
+
+        const matchAC =
+          filter.type === 'AC' &&
+          connectors.some(c => c.current_type.includes('AC'));
+
+        const matchDC =
+          filter.type === 'DC' &&
+          connectors.some(c => c.current_type.includes('DC'));
+
+        return matchAC || matchDC ? station : null;
+      })
+    );
+
+    const filtered = results.filter(Boolean);
+
+    setFilteredData(filtered);
+    setShowFilter(false);
+  };
 
   // ================= RENDER =================
   const renderItem = ({ item }: any) => {
@@ -115,8 +159,11 @@ export default function StationsScreen({ navigation }: any) {
         activeOpacity={0.8}
         onPress={() => {
           navigation.navigate('Map', {
-            screen: 'MapScreen',
-            params: { station: item },
+            screen: 'MapMain',
+            params: { 
+              station: item,
+              trigger: Date.now(),
+             },
           });
         }}
       >
@@ -205,10 +252,18 @@ export default function StationsScreen({ navigation }: any) {
         <SearchBar
           value={search}
           onChange={setSearch}
+          onFilterPress={() => setShowFilter(true)}
           placeholder="Search EV stations..."
-          showFilter={false}
+          showFilter={true}
+        />
+
+        <FilterModal
+          visible={showFilter}
+          onClose={() => setShowFilter(false)}
+          onApply={applyFilter}
         />
       </View>
+
 
       {/* LIST */}
       <FlatList

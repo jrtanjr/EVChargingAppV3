@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, Keyboard, TextInput, PermissionsAndroid } from 
 import MapView, { Marker, Region } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
+import { useRoute } from '@react-navigation/native';
 
 import TopBar from '../../components/map/TopBar';
 import StationPopup from '../../components/stations/StationPopup';
@@ -53,10 +54,36 @@ export default function MapScreen({ navigation }: any) {
   const mapRef = useRef<MapView | null>(null);
   const [userLocation, setUserLocation] = useState<any>(null);
 
+  const route = useRoute<any>();
+
+  useEffect(() => {
+    console.log('ROUTE PARAMS:', route.params);
+  }, [route.params]);
+
   useEffect(() => {
     init();
     getUserLocation();
   }, []);
+
+  useEffect(() => {
+    if (route.params?.station) {
+      const station = route.params.station;
+
+      setSelectedStation(station);
+
+      // focus map
+      mapRef.current?.animateToRegion(
+        {
+          latitude: station.latitude,
+          longitude: station.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        },
+        500
+      );
+
+    }
+  }, [route.params?.trigger]);
 
   const init = async () => {
     try {
