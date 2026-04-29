@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View, StyleSheet, Text, Keyboard, TextInput } from 'react-native';
+import { View, StyleSheet, Text, Keyboard, TextInput, PermissionsAndroid } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Geolocation from 'react-native-geolocation-service';
+import Geolocation from '@react-native-community/geolocation';
 
 import TopBar from '../../components/map/TopBar';
 import StationPopup from '../../components/stations/StationPopup';
@@ -11,6 +11,12 @@ import SearchBar from '../../components/map/SearchBar';
 
 import { fetchStationsFromAPI, transformStations } from '../../services/api/apiService';
 import { insertStationsWithConnectors, getStations, getConnectorsByStation } from '../../services/database/stationService';
+
+declare global {
+  interface Navigator {
+    geolocation: any;
+  }
+}
 
 type Station = {
   id: number;
@@ -27,6 +33,8 @@ const DEFAULT_REGION: Region = {
   latitudeDelta: 0.5,
   longitudeDelta: 0.5,
 };
+
+
 
 export default function MapScreen({ navigation }: any) {
   const [stations, setStations] = useState<Station[]>([]);
@@ -76,7 +84,13 @@ export default function MapScreen({ navigation }: any) {
   // ==============================
   // GET USER LOCATION
   // ==============================
-  const getUserLocation = () => {
+  const getUserLocation = async () => {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    );
+
+    if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
+
     Geolocation.getCurrentPosition(
       (position) => {
         const coords = {
@@ -84,30 +98,16 @@ export default function MapScreen({ navigation }: any) {
           longitude: position.coords.longitude,
         };
 
-        console.log('USER LOCATION:', coords); // debug
-
         setUserLocation(coords);
-
-        // Optional: center map to user
-        mapRef.current?.animateToRegion(
-          {
-            ...coords,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          },
-          500
-        );
       },
-      (error) => {
-        console.log('LOCATION ERROR:', error);
-      },
+      (error) => console.log(error.message),
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
+        timeout: 20000,
+        maximumAge: 1000,
       }
     );
-  }; 
+  };
 
   // ==============================
   // SEARCH

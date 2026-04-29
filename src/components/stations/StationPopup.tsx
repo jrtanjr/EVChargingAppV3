@@ -69,19 +69,29 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
   
 
   return (
-    
     <View style={styles.popup}>
-      
+
       {/* HEADER */}
-      <View style={styles.header}>
+      <View style={styles.headerRow}>
         <Text style={styles.title} numberOfLines={2}>
           {station.name}
         </Text>
 
+        <TouchableOpacity onPress={handleToggleFavourite}>
+          <Icon
+            name={isFavourite ? 'star' : 'star-outline'}
+            size={22}
+            color="#facc15"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* INNER BOX */}
+      <View style={styles.innerBox}>
+
         <Text style={styles.address}>
           {station.address}
         </Text>
-
 
         {/* 📍 Distance */}
         {distanceLabel && (
@@ -89,51 +99,44 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
             📍 {distanceLabel}
           </Text>
         )}
+
+        {/* AC */}
+        {acTotal > 0 && (
+          <View style={styles.infoRow}>
+            <Icon name="power-plug" size={18} color="#3b82f6" />
+
+            <Text style={styles.infoText}>
+              AC • {acPower} kW
+            </Text>
+
+            <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
+              <Text style={styles.badgeText}>
+                {acAvailable}/{acTotal}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* DC */}
+        {dcTotal > 0 && (
+          <View style={styles.infoRow}>
+            <Icon name="flash" size={18} color="#f97316" />
+
+            <Text style={styles.infoText}>
+              DC • {dcPower} kW
+            </Text>
+
+            <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
+              <Text style={styles.badgeText}>
+                {dcAvailable}/{dcTotal}
+              </Text>
+            </View>
+          </View>
+        )}
+
       </View>
 
-      {/* AC */}
-      {acTotal > 0 && (
-        <View style={styles.infoRow}>
-          <Icon name="power-plug" size={18} color="#3b82f6" />
-          <Text style={styles.infoText}>
-            AC • {acPower} kW
-          </Text>
-          <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
-            <Text style={styles.badgeText}>
-              {acAvailable} / {acTotal}
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {/* DC */}
-      {dcTotal > 0 && (
-        <View style={styles.infoRow}>
-          <Icon name="flash" size={18} color="#f97316" />
-          <Text style={styles.infoText}>
-            DC • {dcPower} kW
-          </Text>
-          <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
-            <Text style={styles.badgeText}>
-              {dcAvailable} / {dcTotal}
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {/* Favourite */}
-      <TouchableOpacity
-        style={styles.favButton}
-        onPress={handleToggleFavourite}
-      >
-        <Icon
-          name={isFavourite ? 'star' : 'star-outline'}
-          size={30}
-          color="#facc15"
-        />
-      </TouchableOpacity>
-
-      {/* Button */}
+      {/* BUTTON */}
       {station.available_ports > 0 ? (
         <TouchableOpacity
           style={styles.startButton}
@@ -163,94 +166,101 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
 const styles = StyleSheet.create({
 
   popup: {
-    position: 'absolute',
-    bottom: 40,
-    left: 20,
-    right: 20,
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    elevation: 5,
-  },
+  position: 'absolute',
+  bottom: 40,
+  left: 20,
+  right: 20,
+  backgroundColor: '#1f2937',
+  borderRadius: 14,
+  padding: 16,
+},
 
-  header: {
-    paddingRight: 40, // space for fav button
-  },
+headerRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+},
 
-  title: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 5,
-  },
+title: {
+  flex: 1,
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 16,
+},
 
-  address: {
-    marginBottom: 8,
-    color: '#555',
-  },
+innerBox: {
+  marginTop: 12,
+  backgroundColor: '#111827',
+  padding: 14,
+  borderRadius: 10,
+  borderLeftWidth: 3,
+  borderLeftColor: '#22c55e',
+},
 
-  startButton: {
-    marginTop: 10,
-    backgroundColor: '#15743c',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
+address: {
+  color: '#ffffff',
+  marginBottom: 8,
+  fontSize: 14,
+  fontWeight: 'bold',
+},
 
-  startButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
+distance: {
+  color: '#ffffff',
+  fontSize: 14,
+  fontWeight: 'bold',
+  marginBottom: 6,
+},
 
-  disabledButton: {
-    marginTop: 10,
-    backgroundColor: '#ccc',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
+infoRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: 8,
+},
 
-  disabledText: {
-    color: '#555',
-    fontWeight: 'bold',
-  },
+infoText: {
+  flex: 1,
+  marginLeft: 8,
+  color: '#e5e7eb',
+  fontWeight: 'bold',
+},
 
-  favButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 10,
-  },
+badge: {
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12,
+},
 
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    paddingVertical: 6,
-  },
+badgeText: {
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 12,
+},
 
-  infoText: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 14,
-    fontWeight: '500',
-  },
+startButton: {
+  marginTop: 12,
+  backgroundColor: '#15743c',
+  padding: 12,
+  borderRadius: 10,
+  alignItems: 'center',
+},
 
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
+startButtonText: {
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 16,
+},
 
-  badgeText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
+disabledButton: {
+  marginTop: 12,
+  backgroundColor: '#374151',
+  padding: 12,
+  borderRadius: 10,
+  alignItems: 'center',
+},
 
-  distance: {
-    color: '#6b7280',
-    fontSize: 12,
-    marginBottom: 8,
-  },
+disabledText: {
+  color: '#9ca3af',
+  fontWeight: 'bold',
+},
+  
 });

@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Geolocation from '@react-native-community/geolocation';
 
 import { getStations } from '../../services/database/stationService';
 import { getFavourites, toggleFavourite } from '../../services/storage/favouriteService';
 import SearchBar from '../../components/map/SearchBar';
+import TopBar from '../../components/map/TopBar';
+import { getDistanceKm } from '../../services/api/apiService';
 
 export default function FavouriteScreen({ navigation }: any) {
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState('');
+  const [userLocation, setUserLocation] = useState<any>(null);
 
   useFocusEffect(
     React.useCallback(() => {
       loadFavourites();
     }, [])
   );
+
+  useEffect(() => {
+    const getLocation = async () => {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
+
+      Geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          });
+        },
+        (err) => console.log(err),
+        { enableHighAccuracy: true }
+      );
+    };
+
+    getLocation();
+  }, []);
 
   const loadFavourites = async () => {
     const favIds = await getFavourites();
@@ -43,6 +70,15 @@ export default function FavouriteScreen({ navigation }: any) {
   const renderItem = ({ item }: any) => {
     const isAvailable = item.available_ports > 0;
 
+    const distance = userLocation
+      ? getDistanceKm(
+          userLocation.latitude,
+          userLocation.longitude,
+          item.latitude,
+          item.longitude
+        )
+      : null;
+
     return (
       <TouchableOpacity
         style={styles.card}
@@ -56,48 +92,48 @@ export default function FavouriteScreen({ navigation }: any) {
       >
         {/* HEADER */}
         <View style={styles.headerRow}>
-
-          <Text
-            style={styles.name}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
+          <Text style={styles.name} numberOfLines={2}>
             {item.name}
           </Text>
 
-          <TouchableOpacity style={styles.starBtn}
+          <TouchableOpacity
+            style={styles.starBtn}
             onPress={() => handleToggleFavourite(item.id)}
           >
             <Icon name="star" size={22} color="#facc15" />
           </TouchableOpacity>
-
         </View>
 
         {/* INNER BOX */}
         <View style={styles.innerBox}>
-
           <Text style={styles.address}>
             {item.address || 'No address'}
           </Text>
 
-          <View style={styles.row}>
-            <Text style={styles.text}>
-              <Icon name="power-plug" size={17} color="#ffffff" />
-               {item.available_ports}/{item.total_ports} available
+          {/* 📍 Distance */}
+          {distance && (
+            <Text style={styles.distance}>
+              📍 {distance.toFixed(1)} km away
             </Text>
+          )}
 
-            <Text
-              style={[
-                styles.status,
-                { color: isAvailable ? '#22c55e' : '#ef4444' },
-              ]}
-            >
-              {isAvailable
-                ? `${item.available_ports} Available`
-                : 'Fully Occupied'}
-            </Text>
-          </View>
+            <View style={styles.row}>
+              <Text style={styles.text}>
+                <Icon name="power-plug" size={17} color="#ffffff" />
+                {item.available_ports}/{item.total_ports} available
+              </Text>
 
+              <Text
+                style={[
+                  styles.status,
+                  { color: isAvailable ? '#22c55e' : '#ef4444' },
+                ]}
+              >
+                {isAvailable
+                  ? `${item.available_ports} Available`
+                  : 'Fully Occupied'}
+              </Text>
+            </View>
         </View>
       </TouchableOpacity>
     );
@@ -180,7 +216,7 @@ const styles = StyleSheet.create({
   },
 
   address: {
-    color: '#9ca3af',
+    color: '#ffffff',
     marginBottom: 8,
     fontSize: 14,
     fontWeight: 'bold',
@@ -200,6 +236,13 @@ const styles = StyleSheet.create({
   status: {
     color: '#22c55e',
     fontWeight: 'bold',
+  },
+
+  distance: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 6,
   },
 
   emptyContainer: {
