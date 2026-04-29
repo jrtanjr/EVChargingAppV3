@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, UIManager, Platform, ScrollView, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, ScrollView, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-// Enable animation (Android fix)
-if (Platform.OS === 'android') {
-  UIManager.setLayoutAnimationEnabledExperimental?.(true);
-}
- 
 
 const FAQS = [
   {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, LayoutAnimation, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const TERMS = [
@@ -36,6 +37,14 @@ const TERMS = [
 ];
 
 export default function TermsScreen() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const toggle = (index: number) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    setActiveIndex(activeIndex === index ? null : index);
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -48,19 +57,37 @@ export default function TermsScreen() {
       </View>
 
       {/* TERMS CARDS */}
-      {TERMS.map((item, index) => (
-        <View key={index} style={styles.card}>
+      {TERMS.map((item, index) => {
+        const isOpen = activeIndex === index;
 
-          <View style={styles.row}>
-            <Text style={styles.sectionTitle}>{item.title}</Text>
-          </View>
+        return (
+          <TouchableOpacity
+            key={index}
+            activeOpacity={0.8}
+            style={[
+              styles.card,
+              isOpen && styles.activeCard,
+            ]}
+            onPress={() => toggle(index)}
+          >
+            <View style={styles.row}>
+              <Text style={styles.sectionTitle}>{item.title}</Text>
 
-          <View style={styles.answerBox}>
-            <Text style={styles.text}>{item.content}</Text>
-          </View>
+              <Icon
+                name={isOpen ? 'chevron-up' : 'chevron-down'}
+                size={30}
+                color={isOpen ? '#22c55e' : '#9ca3af'}
+              />
+            </View>
 
-        </View>
-      ))}
+            {isOpen && (
+              <View style={styles.answerBox}>
+                <Text style={styles.text}>{item.content}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        );
+      })}
 
       {/* FOOTER */}
       <Text style={styles.footer}>
@@ -99,6 +126,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
 
+  activeCard: {
+    borderWidth: 1.5,
+    borderColor: '#22c55e',
+  },
+
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -128,7 +160,8 @@ const styles = StyleSheet.create({
 
   footer: {
     color: '#9ca3af',
-    fontSize: 14,
+    fontSize: 18,
+    fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 30,
