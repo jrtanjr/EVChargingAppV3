@@ -243,6 +243,14 @@ export default function StationsScreen({ navigation }: any) {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 15 }}
+
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+                No stations found.
+            </Text>
+          </View>
+          }
       />
 
     </View>
@@ -353,4 +361,16 @@ const styles = StyleSheet.create({
   status: {
     fontWeight: 'bold',
   },
+
+  emptyContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+
+  emptyText: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  
 });

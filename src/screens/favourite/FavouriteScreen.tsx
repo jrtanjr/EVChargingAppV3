@@ -240,7 +240,7 @@ export default function FavouriteScreen({ navigation }: any) {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
-              No favourite stations yet
+              No favourite stations found.
             </Text>
           </View>
         }
