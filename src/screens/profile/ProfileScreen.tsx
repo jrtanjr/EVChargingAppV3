@@ -1,60 +1,186 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { getCurrentUser, logout } from '../../services/api/authService';
-import { supabase } from '../../services/api/supabaseClient';
+import { getProfile, saveProfile } from '../../services/api/profileService';
 
-export default function ProfileScreen({ navigation }: any) {
+export default function ProfileScreen( ) {
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>({});
+  const [editing, setEditing] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [plateError, setPlateError] = useState('');
+  const [originalProfile, setOriginalProfile] = useState<any>({});
 
   useEffect(() => {
-    loadUser();
+    load();
   }, []);
 
-  const loadUser = async () => {
+  const load = async () => {
     const u = await getCurrentUser();
+
+    if (!u) return; 
+
     setUser(u);
+
+    const p = await getProfile(u.id);
+    if (p) setProfile(p);
+    setOriginalProfile(p);
   };
 
+  // ==============================
+  // SAVE
+  // ==============================
+  const handleSave = async () => {
+
+    if (!user?.id) return;
+
+     if (phoneError || plateError || !profile.phone || !profile.car_plate) {
+      return;
+    }
+
+    await saveProfile({
+      id: user.id,
+      phone: profile.phone,
+      car_plate: profile.car_plate,
+    });
+
+    setEditing(false);
+  };
+
+  // ==============================
+  // CANCEL EDIT
+  // ==============================
+  const handleCancel = () => {
+    setProfile(originalProfile); 
+    setEditing(false);
+  };
+
+  // ==============================
+  // LOGOUT
+  // ==============================
   const handleLogout = async () => {
-     await supabase.auth.signOut();
+    await logout();
+  };
+
+  // ================= VALIDATION =================
+  const validatePhone = (value: string) => {
+    // remove non-numeric
+    const cleaned = value.replace(/[^0-9]/g, '');
+
+    setProfile({ ...profile, phone: cleaned });
+
+    if (!cleaned) {
+      setPhoneError('Phone number is required');
+    } else if (cleaned.length < 10 || cleaned.length > 11) {
+      setPhoneError('Phone must be 10–11 digits');
+    } else {
+      setPhoneError('');
+    }
+  };
+
+  const validatePlate = (value: string) => {
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+    setProfile({ ...profile, car_plate: cleaned });
+
+    if (!cleaned) {
+      setPlateError('Car plate is required');
+    } else if (cleaned.length < 5) {
+      setPlateError('Invalid car plate');
+    } else {
+      setPlateError('');
+    }
   };
 
   return (
     <View style={styles.container}>
 
-      {/* PROFILE CARD */}
+      <View style={styles.content}>
+
+      {/* AVATAR */}
+        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+          <Icon name="account-circle" size={200} color="#22c55e" />
+        </View>
+      
+      <Text style={styles.email}>{user?.email}</Text>
+
+      {/* INFO */}
       <View style={styles.card}>
+        {editing ? (
+          <>
+            <TextInput
+              placeholder="Phone"
+              placeholderTextColor="#aaa"
+              value={profile.phone}
+              onChangeText={validatePhone}
+              keyboardType="numeric"
+              style={[
+                styles.input,
+                !!phoneError && styles.inputError,
+                !phoneError && profile.phone && styles.inputValid,
+              ]}
+            />
 
-        <Icon name="account-circle" size={90} color="#22c55e" />
+            {phoneError ? (
+              <Text style={styles.errorText}>{phoneError}</Text>
+            ) : null}
 
-        <Text style={styles.name}>
-          {user?.email?.split('@')[0] || 'User'}
-        </Text>
+            <TextInput
+              placeholder="Car Plate"
+              placeholderTextColor="#aaa"
+              value={profile.car_plate}
+              onChangeText={validatePlate}
+              autoCapitalize="characters"
+              style={[
+                styles.input,
+                !!plateError && styles.inputError,
+                !plateError && profile.car_plate && styles.inputValid,
+              ]}
+            />
 
-        <Text style={styles.email}>
-          {user?.email}
-        </Text>
-
+            {plateError ? (
+              <Text style={styles.errorText}>{plateError}</Text>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <Text style={styles.label}>
+              Phone: {profile.phone || '-'}
+            </Text>
+            <Text style={styles.label}>
+              Car Plate: {profile.car_plate || '-'}
+            </Text>
+          </>
+        )}
       </View>
 
-      {/* INFO CARD */}
-      <View style={styles.infoCard}>
-        <Text style={styles.label}>Phone: -</Text>
-        <Text style={styles.label}>Car Plate: -</Text>
-      </View>
-
-      {/* ACTIONS */}
+      {/* BUTTONS */}
       <View style={styles.actions}>
+        {editing ? (
+          <>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+              <Text style={styles.btnText}>Save</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.editBtn}>
-          <Text style={styles.btnText}>Edit</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
+              <Text style={styles.btnText}>Cancel</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={() => setEditing(true)}
+          >
+            <Text style={styles.btnText}>Edit</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Text style={styles.btnText}>Logout</Text>
         </TouchableOpacity>
+        </View>
 
       </View>
 
@@ -66,64 +192,120 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
+    justifyContent: 'center',
     padding: 20,
   },
 
-  card: {
+  content: {
     alignItems: 'center',
-    backgroundColor: '#1f2937',
-    padding: 20,
-    borderRadius: 14,
-    marginBottom: 20,
+    width: '100%',
   },
 
-  name: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 10,
+  avatar: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: '#22c55e',
   },
 
   email: {
     color: '#9ca3af',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
   },
 
-  infoCard: {
+  card: {
+    width: '100%',
     backgroundColor: '#1f2937',
-    padding: 15,
-    borderRadius: 12,
+    padding: 16,
+    borderRadius: 14,
+    marginTop: 15,
   },
 
   label: {
     color: 'white',
-    marginBottom: 8,
+    fontSize: 16,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+
+  input: {
+    backgroundColor: '#111827',
+    color: 'white',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#374151',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   actions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 20,
+    width: '100%',
+    justifyContent: 'space-between',
   },
 
   editBtn: {
-    backgroundColor: '#374151',
-    padding: 12,
-    borderRadius: 8,
     flex: 1,
-    marginRight: 10,
+    backgroundColor: '#374151',
+    padding: 14,
+    borderRadius: 10,
+    marginRight: 8,
+    alignItems: 'center',
+  },
+
+  inputError: {
+    borderColor: '#ef4444',
+  },
+
+  inputValid: {
+    borderColor: '#22c55e',
+  },
+
+  errorText: {
+    color: '#ef4444',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    marginTop: -6,
+  },
+
+  saveBtn: {
+    flex: 1,
+    backgroundColor: '#15743c',
+    padding: 14,
+    borderRadius: 10,
+    marginRight: 8,
+    alignItems: 'center',
+  },
+
+  cancelBtn: {
+    flex: 1,
+    backgroundColor: '#6b7280',
+    padding: 14,
+    borderRadius: 10,
+    marginRight: 8,
     alignItems: 'center',
   },
 
   logoutBtn: {
-    backgroundColor: '#ef4444',
-    padding: 12,
-    borderRadius: 8,
     flex: 1,
+    backgroundColor: '#ef4444',
+    padding: 14,
+    borderRadius: 10,
     alignItems: 'center',
   },
 
   btnText: {
     color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
+
 });

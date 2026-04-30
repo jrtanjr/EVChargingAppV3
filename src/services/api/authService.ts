@@ -9,7 +9,7 @@ export const signUp = async (email: string, password: string) => {
 
   if (error) throw error;
 
-  // 🔥 CREATE PROFILE AFTER SIGNUP
+  //  CREATE PROFILE AFTER SIGNUP
   if (data.user) {
     await supabase.from('profiles').insert({
       id: data.user.id,
