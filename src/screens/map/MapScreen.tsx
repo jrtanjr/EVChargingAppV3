@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View, StyleSheet, Text, Keyboard, TextInput, PermissionsAndroid } from 'react-native';
+import { View, StyleSheet, Text, Keyboard, TextInput, PermissionsAndroid, FlatList, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
@@ -10,7 +10,7 @@ import StationPopup from '../../components/stations/StationPopup';
 import FilterModal from '../../components/map/FilterModal';
 import SearchBar from '../../components/map/SearchBar';
 
-import { fetchStationsFromAPI, transformStations } from '../../services/api/apiService';
+import { fetchStationsFromAPI, transformStations, getDistanceKm } from '../../services/api/apiService';
 import { insertStationsWithConnectors, getStations, getConnectorsByStation } from '../../services/database/stationService';
 
 declare global {
@@ -54,6 +54,9 @@ export default function MapScreen({ navigation }: any) {
   const mapRef = useRef<MapView | null>(null);
   const [userLocation, setUserLocation] = useState<any>(null);
 
+  const [nearbyStations, setNearbyStations] = useState<any[]>([]);
+  const [showNearby, setShowNearby] = useState(true);
+
   const route = useRoute<any>();
 
 
@@ -62,7 +65,7 @@ export default function MapScreen({ navigation }: any) {
     getUserLocation();
   }, []);
 
-  useEffect(() => {
+  useEffect(() => { 
     if (route.params?.station) {
       const station = route.params.station;
 
@@ -81,6 +84,35 @@ export default function MapScreen({ navigation }: any) {
 
     }
   }, [route.params?.trigger]);
+
+  useEffect(() => { //sort nearby stations
+    if (!userLocation || stations.length === 0) return;
+
+    const sorted = stations
+      .map((s) => {
+        const distance = getDistanceKm(
+          userLocation.latitude,
+          userLocation.longitude,
+          s.latitude,
+          s.longitude
+        );
+
+        return {
+          ...s,
+          distance,
+        };
+      })
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 5);
+
+    setNearbyStations(sorted);
+  }, [userLocation, stations]);
+
+  useEffect(() => {
+    if (selectedStation) {
+      setShowNearby(false); // 🔥 hide when popup opens
+    }
+  }, [selectedStation]);
 
   const init = async () => {
     try {
@@ -374,7 +406,7 @@ export default function MapScreen({ navigation }: any) {
                     },
                   ]}
                 >
-                  <Icon name="ev-station" size={16} color="white" />
+                  <Icon name="ev-station" size={20} color="white" />
                   <Text style={styles.clusterText}>{group.length}</Text>
                 </View>
               </View>
@@ -382,6 +414,59 @@ export default function MapScreen({ navigation }: any) {
           );
         })}
       </MapView>
+      
+      <TouchableOpacity
+        style={styles.toggleNearbyBtn}
+        onPress={() => setShowNearby(prev => !prev)}
+      >
+        <Text style={styles.toggleText}>
+          {showNearby ? 'Hide Nearby' : 'Show Nearby'}
+        </Text>
+      </TouchableOpacity>
+
+      {showNearby && !selectedStation && (
+      <View style={styles.nearbyContainer}>
+        <Text style={styles.nearbyTitle}>Nearby Stations</Text>
+
+        <FlatList
+          data={nearbyStations}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+          
+            <TouchableOpacity
+              style={styles.nearbyCard}
+              onPress={() => focusOnStation(item)}
+            >
+              <Text style={styles.nearbyName}>
+                {item.name || 'Station'}
+              </Text>
+
+              <Text style={styles.nearbyDistance}>
+                {item.distance.toFixed(2)} km
+              </Text>
+
+              <Text
+                style={[
+                  styles.nearbyStatus,
+                  {
+                    color:
+                      item.available_ports > 0
+                        ? '#22c55e'
+                        : '#ef4444',
+                  },
+                ]}
+              >
+                {item.available_ports > 0
+                  ? 'Available'
+                  : 'Full'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+      )}
 
       {selectedStation && (
         <StationPopup
@@ -457,5 +542,58 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+
+  toggleNearbyBtn: {
+    position: 'absolute',
+    bottom: 15,
+    alignSelf: 'center',
+    backgroundColor: '#1f2937',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    zIndex: 20,
+  },
+
+  toggleText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+
+  nearbyContainer: {
+    position: 'absolute',
+    bottom: 90,
+    width: '100%',
+  },
+
+  nearbyTitle: {
+    fontSize:20,
+    color: 'black',
+    fontWeight: 'bold',
+    marginLeft: 15,
+    marginBottom: 6,
+  },
+
+  nearbyCard: {
+    backgroundColor: '#1f2937',
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
+    width: 180,
+  },
+
+  nearbyName: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+
+  nearbyDistance: {
+    color: '#9ca3af',
+    marginTop: 4,
+  },
+
+  nearbyStatus: {
+    marginTop: 6,
+    fontWeight: 'bold',
   },
 });

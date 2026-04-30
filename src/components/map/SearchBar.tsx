@@ -30,7 +30,7 @@ export default function SearchBar({ value, onChange, onFilterPress,
       {/* ⚙️ Filter Button */}
       {showFilter && (
         <TouchableOpacity onPress={onFilterPress} style={styles.filterBtn}>
-          <Icon name="tune" size={20} color="white" />
+          <Icon name="filter" size={20} color="white" />
         </TouchableOpacity>
       )}
 

@@ -145,12 +145,12 @@ const styles = StyleSheet.create({
 
   popup: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 60,
     left: 20,
     right: 20,
     backgroundColor: '#1f2937',
     borderRadius: 14,
-    padding: 16,
+    padding: 14,
   },
 
   headerRow: {
