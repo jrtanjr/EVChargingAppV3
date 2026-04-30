@@ -12,14 +12,18 @@ export default function FilterModal({ visible, onClose, onApply }: any) {
 
           {/* HEADER */}
           <View style={styles.header}>
-            <Text style={styles.title}>⚙️ Filter Chargers</Text>
+            <Icon name="filter" size={30} color="gray" />
+            <Text style={styles.title}>Filter EV Stations</Text>
 
             <TouchableOpacity onPress={onClose}>
-              <Icon name="close" size={25} color="red" />
+              <Icon name="close" size={30} color="red" />
             </TouchableOpacity>
           </View>
 
           {/* OPTIONS */}
+
+          {/* ================= CHARGER TYPE ================= */}
+          <Text style={styles.sectionTitle}>Charger Type</Text>
 
           {/* AC */}
           <TouchableOpacity
@@ -51,7 +55,83 @@ export default function FilterModal({ visible, onClose, onApply }: any) {
             </View>
           </TouchableOpacity>
 
-          {/* DIVIDER */}
+          {/* ================= ACCESS ================= */}
+          <Text style={styles.sectionTitle}>Access</Text>
+
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => onApply({ access: 'PUBLIC' })}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#22c55e' }]}>
+              <Icon name="earth" size={16} color="white" />
+            </View>
+
+            <View style={styles.optionTextBox}>
+              <Text style={styles.optionTitle}>Public Stations</Text>
+              <Text style={styles.optionDesc}>Open to everyone</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => onApply({ access: 'PRIVATE' })}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#ef4444' }]}>
+              <Icon name="lock" size={16} color="white" />
+            </View>
+
+            <View style={styles.optionTextBox}>
+              <Text style={styles.optionTitle}>Private / Restricted</Text>
+              <Text style={styles.optionDesc}>Limited access</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* ================= LOCATION ================= */}
+          <Text style={styles.sectionTitle}>Location Type</Text>
+
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => onApply({ location: 'MALL' })}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#3b82f6' }]}>
+              <Icon name="shopping" size={16} color="white" />
+            </View>
+
+            <View style={styles.optionTextBox}>
+              <Text style={styles.optionTitle}>Shopping Mall</Text>
+              <Text style={styles.optionDesc}>Retail & malls</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => onApply({ location: 'CONDO' })}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#f97316' }]}>
+              <Icon name="office-building" size={16} color="white" />
+            </View>
+
+            <View style={styles.optionTextBox}>
+              <Text style={styles.optionTitle}>Condo / Residential</Text>
+              <Text style={styles.optionDesc}>Apartments & homes</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => onApply({ location: 'HOTEL' })}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#a855f7' }]}>
+              <Icon name="bed" size={16} color="white" />
+            </View>
+
+            <View style={styles.optionTextBox}>
+              <Text style={styles.optionTitle}>Hotel</Text>
+              <Text style={styles.optionDesc}>Stay & charge</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* ================= DIVIDER ================= */}
           <View style={styles.divider} />
 
           {/* RESET */}
@@ -81,7 +161,7 @@ const styles = StyleSheet.create({
   modal: {
     margin: 20,
     padding: 20,
-    backgroundColor: '#222222',
+    backgroundColor: '#1f2937',
     borderRadius: 20,
   },
 
@@ -132,6 +212,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#6b7280',
+  },
+
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#9ca3af',
+    marginTop: 10,
+    marginBottom: 5,
   },
 
   divider: {

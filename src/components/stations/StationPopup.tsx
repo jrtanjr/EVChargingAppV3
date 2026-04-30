@@ -6,6 +6,8 @@ import { toggleFavourite, isFavouriteStation } from '../../services/storage/favo
 import { getConnectorsByStation } from '../../services/database/stationService';
 import { getDistanceKm } from '../../services/api/apiService';
 
+import StationCard from './StationCard';
+
 export default function StationPopup({ station, userLocation, onClose, navigation }: any) {
   const [connectors, setConnectors] = useState<any[]>([]);
   const [isFavourite, setIsFavourite] = useState(false);
@@ -92,55 +94,11 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
         </TouchableOpacity>
       </View>
 
-      {/* INNER BOX */}
-      <View style={styles.innerBox}>
-
-        <Text style={styles.address}>
-          {station.address}
-        </Text>
-
-        {/* AC */}
-        {acTotal > 0 && (
-          <View style={styles.infoRow}>
-            <Icon name="power-plug" size={18} color="#3b82f6" />
-
-            <Text style={styles.infoText}>
-              AC • {acPower} kW
-            </Text>
-
-            <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
-              <Text style={styles.badgeText}>
-                {acAvailable}/{acTotal}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* DC */}
-        {dcTotal > 0 && (
-          <View style={styles.infoRow}>
-            <Icon name="flash" size={18} color="#f97316" />
-
-            <Text style={styles.infoText}>
-              DC • {dcPower} kW
-            </Text>
-
-            <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
-              <Text style={styles.badgeText}>
-                {dcAvailable}/{dcTotal}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* 📍 Distance */}
-        {distanceLabel && (
-          <Text style={styles.distance}>
-            📍 {distanceLabel}
-          </Text>
-        )}
-
-      </View>
+      <StationCard
+        station={station}
+        connectors={connectors}
+        userLocation={userLocation}
+      />
 
       {/* BUTTON */}
       <View style={styles.buttonRow}>

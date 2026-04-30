@@ -10,6 +10,7 @@ import SearchBar from '../../components/map/SearchBar';
 import { getDistanceKm } from '../../services/api/apiService';
 
 import FilterModal from '../../components/map/FilterModal';
+import StationCard from '../../components/stations/StationCard';
 
 
 export default function StationsScreen({ navigation }: any) {
@@ -103,21 +104,41 @@ export default function StationsScreen({ navigation }: any) {
       data.map(async (station) => {
         const connectors = await getConnectorsByStation(station.id);
 
-        const matchAC =
-          filter.type === 'AC' &&
-          connectors.some(c => c.current_type.includes('AC'));
+        const name = station.name?.toLowerCase() || '';
+        const address = station.address?.toLowerCase() || '';
 
-        const matchDC =
-          filter.type === 'DC' &&
-          connectors.some(c => c.current_type.includes('DC'));
+        // TYPE
+        const matchType =
+          !filter.type ||
+          (filter.type === 'AC' &&
+            connectors.some(c => c.current_type.includes('AC'))) ||
+          (filter.type === 'DC' &&
+            connectors.some(c => c.current_type.includes('DC')));
 
-        return matchAC || matchDC ? station : null;
+        // ACCESS
+        const isPublic = name.includes('[public]');
+
+        const matchAccess =
+          !filter.access ||
+          (filter.access === 'PUBLIC' && isPublic) ||
+          (filter.access === 'PRIVATE' && !isPublic);
+
+        // LOCATION
+        const matchLocation =
+          !filter.location ||
+          (filter.location === 'MALL' &&
+            (name.includes('mall') || address.includes('mall'))) ||
+          (filter.location === 'HOTEL' && name.includes('hotel')) ||
+          (filter.location === 'CONDO' &&
+            (name.includes('condo') || name.includes('residential')));
+
+        return matchType && matchAccess && matchLocation
+          ? station
+          : null;
       })
     );
 
-    const filtered = results.filter(Boolean);
-
-    setFilteredData(filtered);
+    setFilteredData(results.filter(Boolean));
     setShowFilter(false);
   };
 
@@ -185,61 +206,12 @@ export default function StationsScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
-        {/* INNER BOX */}
-        <View style={styles.innerBox}>
-          <Text style={styles.address}>
-            {item.address}
-          </Text>
+        <StationCard
+          station={item}
+          connectors={connectors}
+          userLocation={userLocation}
+        />
 
-          {/* AC */}
-          {acTotal > 0 && (
-            <View style={styles.infoRow}>
-              <Icon name="power-plug" size={18} color="#3b82f6" />
-              <Text style={styles.infoText}>
-                AC • {acPower} kW
-              </Text>
-              <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
-                <Text style={styles.badgeText}>
-                  {acAvailable}/{acTotal}
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {/* DC */}
-          {dcTotal > 0 && (
-            <View style={styles.infoRow}>
-              <Icon name="flash" size={18} color="#f97316" />
-              <Text style={styles.infoText}>
-                DC • {dcPower} kW
-              </Text>
-              <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
-                <Text style={styles.badgeText}>
-                  {dcAvailable}/{dcTotal}
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {/* DISTANCE */}
-          {distance && (
-            <Text style={styles.distance}>
-              📍 {distance.toFixed(1)} km away
-            </Text>
-          )}
-
-          {/* STATUS */}
-          <Text
-            style={[
-              styles.status,
-              { color: isAvailable ? '#22c55e' : '#ef4444' },
-            ]}
-          >
-            {isAvailable
-              ? `${item.available_ports}/${item.total_ports} Available`
-              : 'Fully Occupied'}
-          </Text>
-        </View>
       </TouchableOpacity>
     );
   };
@@ -323,6 +295,26 @@ const styles = StyleSheet.create({
   address: {
     color: '#ffffff',
     marginBottom: 8,
+    fontWeight: 'bold',
+  },
+
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 8,
+  },
+
+  tag: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginRight: 6,
+    marginBottom: 4,
+  },
+
+  tagText: {
+    color: 'white',
+    fontSize: 11,
     fontWeight: 'bold',
   },
 
