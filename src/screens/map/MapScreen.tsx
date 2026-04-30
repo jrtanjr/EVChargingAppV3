@@ -512,14 +512,14 @@ const styles = StyleSheet.create({
 
   suggestionBox: {
     backgroundColor: 'white',
-    marginTop: 1,
-    borderRadius: 5,
+    marginTop: 2,
+    borderRadius: 16,
     elevation: 10,
   },
 
   suggestionItem: {
-    padding: 8,
-    borderBottomWidth: 1,
+    padding: 10,
+    borderBottomWidth: 2,
     borderBottomColor: '#ccc2c2',
   },
 

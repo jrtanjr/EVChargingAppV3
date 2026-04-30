@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, Image } from 'react-native';
 
 import { login, signUp } from '../../services/api/authService';
 
@@ -66,7 +66,15 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>EZChargeEV User Login</Text>
+      <View style={styles.header}>
+      <Image
+        source={require('../../Icon/EZChargeEV_Icon.png')}
+        style={styles.logo}
+      />
+
+      <Text style={styles.appName}>EZChargeEV</Text>
+      <Text style={styles.subtitle}>User Login</Text>
+    </View>
 
       {/* ================= EMAIL ================= */}
       <TextInput
@@ -141,6 +149,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  header: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+
+  logo: {
+    width: 100,
+    height: 100,
+    borderRadius: 16,
+    marginBottom: 10,
+  },
+
+  appName: {
+    color: '#22c55e',
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+
+  subtitle: {
+    color: '#cbd5f5',
+    fontSize: 20,
+    marginTop: 4,
+  },
+
   input: {
     backgroundColor: '#1f2937',
     color: 'white',
@@ -184,8 +216,9 @@ const styles = StyleSheet.create({
 
   errorText: {
     color: '#ef4444',
-    fontSize: 13,
-    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 10,
     marginLeft: 2,
   },
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking  } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { toggleFavourite, isFavouriteStation } from '../../services/storage/favouriteService';
 import { getConnectorsByStation } from '../../services/database/stationService';
 import { getDistanceKm } from '../../services/api/apiService';
+
 
 import StationCard from './StationCard';
 
@@ -14,8 +16,13 @@ export default function StationPopup({ station, userLocation, onClose, navigatio
 
   useEffect(() => {
     loadConnectors();
-    loadFavourite();
   }, [station.id]);
+
+  useFocusEffect(
+      React.useCallback(() => {
+        loadFavourite();
+      }, [station.id])
+    );
 
   const loadFavourite = async () => {
     const result = await isFavouriteStation(station.id);

@@ -357,30 +357,42 @@ export default function ChargingScreen({ route, navigation }: any) {
           )}
 
           {(isCharging || hasDisconnected) && (
-            <View style={{ alignItems: 'center', marginBottom: 15 }}>
-              <Text style={{ color: 'white', marginBottom: 5, fontWeight: 'bold', fontSize: 16 }}>
+          <View style={styles.infoContainer}>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoText}>
                 Speed: {power} kW
               </Text>
 
-              <Text style={{ color: 'white', marginBottom: 5, fontWeight: 'bold', fontSize: 16 }}>
+              <Text style={styles.infoText}>
                 Remaining Time: {formatTime(remainingTime)}
               </Text>
 
-              <Text style={{ color: 'white', marginBottom: 5, fontWeight: 'bold', fontSize: 16 }}>
+              <Text style={styles.infoText}>
                 Cost: RM {chargingCost.toFixed(2)}
               </Text>
             </View>
+          </View>
           )}
 
           {hasDisconnected && !isFull && (
             <>
-              <Text style={styles.warning}>
-                Charger stopped — idle fees may apply ⚠️
-              </Text>
+            <View style={styles.warningContainer}>
+              <View style={styles.warningBox}>
 
-              <Text style={styles.idle}>
-                Idle Time: {formatTime(idleTime)}
-              </Text>
+                <Text style={styles.idle}>
+                  Idle Time: {formatTime(idleTime)}
+                </Text>
+
+                <Text style={styles.warning}>
+                  Charger stopped — idle fees may apply ⚠️
+                </Text>
+
+                <Text style={styles.idleCharge}>
+                  Idle Charge - RM1 per 5 minutes ⚠️
+                </Text>
+
+              </View>
+            </View>
             </>
           )}
 
@@ -485,7 +497,7 @@ const styles = StyleSheet.create({
   label: {
     color: 'white',
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 
@@ -514,8 +526,8 @@ const styles = StyleSheet.create({
 
   status: {
     color: '#22c55e',
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 20,
+    marginBottom: 15,
     fontWeight: 'bold',
   },
 
@@ -525,16 +537,61 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
+  infoContainer: {
+    backgroundColor: '#1f2937',
+    padding: 2,
+    borderRadius: 15,
+    marginBottom: 6,
+    width: '80%',
+  },
+
+  infoBox:{
+    alignItems: 'center',
+    marginTop: 2, 
+    marginBottom: 2,
+  },
+
+  infoText: {
+    color: 'white', 
+    marginBottom: 5, 
+    fontWeight: 'bold', 
+    fontSize: 16
+  },
+
+  warningContainer: {
+    backgroundColor: '#1f2937',
+    padding: 2,
+    borderRadius: 15,
+    marginBottom: 6,
+    width: '85%',
+  },
+
+  warningBox:{
+    alignItems: 'center',
+    marginTop: 2, 
+    marginBottom: 2,
+  },
+
   warning: {
     color: '#f87171',
     marginTop: 5,
+    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  idleCharge: {
+    color: '#f87171',
+    marginTop: 5,
+    marginBottom: 5,
     fontSize: 16,
     fontWeight: 'bold',
   },
 
   idle: {
     color: 'white',
-    marginTop: 10,
+    marginTop: 5,
+    marginBottom:2,
     fontSize: 16,
     fontWeight: 'bold',
   },

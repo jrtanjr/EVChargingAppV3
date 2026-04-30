@@ -119,7 +119,7 @@ export default function StationCard({
       {/* DISTANCE */}
       {distance && (
         <Text style={styles.distance}>
-          📍 {distance.toFixed(1)} km away
+          📍 ~{distance.toFixed(1)} km away
         </Text>
       )}
 
