@@ -81,7 +81,7 @@ export default function ScanScreen({ navigation }: any) {
 
       {/* BUTTON */}
       <TouchableOpacity style={styles.scanBtn} onPress={handleScan}>
-        <Text style={styles.btnText}>Start Scan</Text>
+        <Text style={styles.btnText}>Scan QR</Text>
       </TouchableOpacity>
 
       {/* LOADING OVERLAY */}
@@ -127,15 +127,15 @@ const styles = StyleSheet.create({
 
   title: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: 25,
+    marginBottom: 25,
   },
 
   scanBtn: {
     backgroundColor: '#22c55e',
-    padding: 15,
+    padding: 20,
     borderRadius: 10,
     marginTop: 10,
   },
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
   btnText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 20,
   },
 
   overlay: {
