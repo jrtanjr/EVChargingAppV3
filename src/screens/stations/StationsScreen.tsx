@@ -247,7 +247,7 @@ export default function StationsScreen({ navigation }: any) {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
-                No stations found.
+                No stations of selected category found.
             </Text>
           </View>
           }

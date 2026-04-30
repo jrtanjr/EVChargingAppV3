@@ -1,42 +1,80 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../api/supabaseClient';
 import { getCurrentUser } from '../api/authService';
-
-const getKey = async () => {
-  const user = await getCurrentUser();
-  return `favourites_${user?.id}`;
-};
 
 // ==============================
 // GET FAVOURITES
 // ==============================
 export const getFavourites = async () => {
-  const key = await getKey();
-  const data = await AsyncStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
+  const user = await getCurrentUser();
+
+  const { data, error } = await supabase
+    .from('favourites')
+    .select('station_id')
+    .eq('user_id', user?.id);
+
+  if (error) {
+    console.log('Get Favourites Error:', error);
+    return [];
+  }
+
+  return data ? data.map((f) => f.station_id) : [];
 };
 
 // ==============================
 // TOGGLE FAVOURITE
 // ==============================
-export const toggleFavourite = async (id: number) => {
-  const key = await getKey();
-  const favs = await getFavourites();
+export const toggleFavourite = async (stationId: number) => {
+  const user = await getCurrentUser();
 
-  let updated;
+  const { data, error } = await supabase
+    .from('favourites')
+    .select('*')
+    .eq('user_id', user?.id)
+    .eq('station_id', stationId);
 
-  if (favs.includes(id)) {
-    updated = favs.filter((f: number) => f !== id);
-  } else {
-    updated = [...favs, id];
+  if (error) {
+    console.log('Toggle Check Error:', error);
+    return;
   }
 
-  await AsyncStorage.setItem(key, JSON.stringify(updated));
+  if (data && data.length > 0) {
+    // REMOVE
+    const { error: deleteError } = await supabase
+      .from('favourites')
+      .delete()
+      .eq('user_id', user?.id)
+      .eq('station_id', stationId);
+
+    if (deleteError) console.log('Delete Favourite Error:', deleteError);
+  } else {
+    // ADD
+    const { error: insertError } = await supabase
+      .from('favourites')
+      .insert({
+        user_id: user?.id,
+        station_id: stationId,
+      });
+
+    if (insertError) console.log('Insert Favourite Error:', insertError);
+  }
 };
 
 // ==============================
 // CHECK FAVOURITE
 // ==============================
-export const isFavouriteStation = async (id: number) => {
-  const favs = await getFavourites();
-  return favs.includes(id);
+export const isFavouriteStation = async (stationId: number) => {
+  const user = await getCurrentUser();
+
+  const { data, error } = await supabase
+    .from('favourites')
+    .select('*')
+    .eq('user_id', user?.id)
+    .eq('station_id', stationId);
+
+  if (error) {
+    console.log('Check Favourite Error:', error);
+    return false;
+  }
+
+  return data && data.length > 0;
 };
