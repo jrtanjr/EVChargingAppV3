@@ -1,6 +1,6 @@
 This is a demo Android Mobile project for Wireless Application Development course. Using Android Studio Simulator.
 
-<img width="1254" height="1254" alt="EZChargeEV Icon" src="https://github.com/user-attachments/assets/f82bd484-f3dc-4f48-9f7c-40b32794ff2d" />
+<img width="950" height="950" alt="EZChargeEV Icon" src="https://github.com/user-attachments/assets/f82bd484-f3dc-4f48-9f7c-40b32794ff2d" />
 
 
 # 🚀 Setup Guide
