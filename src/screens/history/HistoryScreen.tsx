@@ -192,7 +192,7 @@ export default function HistoryScreen() {
               <Icon
                 name="calendar-month-outline"
                 size={30}
-                color="#ffffff"
+                color="#020617"
               />
             </TouchableOpacity>
 
@@ -310,7 +310,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
   },
 
   header: {
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
 
   calendarBtn: {
     padding: 12,
-    backgroundColor: '#000000',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
   },
 

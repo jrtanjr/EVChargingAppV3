@@ -407,17 +407,17 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
 
   topBarContainer: {
-    paddingTop: 5,
-    paddingHorizontal: 15,
-    backgroundColor: 'white',
-    zIndex: 10,
-    height: 60,
-    justifyContent: 'center',
+    position: 'absolute', 
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    backgroundColor: '#020617',
   },
 
   searchWrapper: {
     position: 'absolute',
-    top: 90,
+    top: 75,
     left: 15,
     right: 15,
     zIndex: 20,

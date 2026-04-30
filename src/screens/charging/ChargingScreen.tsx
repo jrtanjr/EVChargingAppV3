@@ -469,7 +469,7 @@ export default function ChargingScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

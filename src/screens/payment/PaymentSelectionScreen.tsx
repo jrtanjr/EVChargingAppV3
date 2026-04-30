@@ -203,7 +203,7 @@ export default function PaymentSelectionScreen({ route, navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
     padding: 20,
     justifyContent: 'center',
   },

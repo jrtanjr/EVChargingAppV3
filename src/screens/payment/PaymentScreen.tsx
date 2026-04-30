@@ -371,7 +371,7 @@ export default function PaymentScreen({ navigation }: any) {
           }}
           style={styles.calendarBtn}
         >
-          <Icon name="calendar-month-outline" size={22} color="#ffffff" />
+          <Icon name="calendar-month-outline" size={22} color="white" />
         </TouchableOpacity>
 
       </View>
@@ -490,12 +490,12 @@ export default function PaymentScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1f2937',
+    backgroundColor: '#020617',
     padding: 15,
   },
 
   card: {
-    backgroundColor: '#000000',
+    backgroundColor: '#161616',
     padding: 20,
     borderRadius: 12,
     marginBottom: 8,
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   filterBtn: {
     padding: 8,
     marginRight: 10,
-    backgroundColor: '#000000',
+    backgroundColor: '#161616',
     borderRadius: 6,
   },
 
@@ -593,13 +593,13 @@ const styles = StyleSheet.create({
 
   calendarBtn: {
     padding: 8,
-    backgroundColor: '#000000',
+    backgroundColor: '#161616',
     borderRadius: 8,
     marginBottom: 5,
   },
 
   datePanel: {
-    backgroundColor: '#000000',
+    backgroundColor: '#161616',
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
   },
 
   cardPreviewMini: {
-    backgroundColor: '#232a2c',
+    backgroundColor: '#000000',
     borderRadius: 16,
     padding: 16,
     marginTop: 10,
@@ -728,14 +728,14 @@ const styles = StyleSheet.create({
   },
 
   txCard: {
-    backgroundColor: '#000000',
+    backgroundColor: '#161616',
     padding: 12,
     borderRadius: 14,
     marginBottom: 2,
   },
 
   txInner: {
-    backgroundColor: '#111827',
+    backgroundColor: '#000000',
     padding: 12,
     borderRadius: 10,
     borderLeftWidth: 3,

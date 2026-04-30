@@ -20,12 +20,12 @@ export default function BottomTabs() {
 
         tabBarStyle: {
           height: 75,
+          backgroundColor: '#020617', // 🔥 match drawer
+          borderTopWidth: 0,
+          elevation: 10,
         },
 
-        tabBarActiveTintColor: '#15743c',
-        tabBarInactiveTintColor: 'gray',
-
-        tabBarIcon: ({ color }) => {
+        tabBarIcon: ({ focused }) => {
           let iconName = '';
           let label = '';
 
@@ -51,8 +51,12 @@ export default function BottomTabs() {
 
           return (
             <View style={styles.tabItem}>
-              <Icon name={iconName} size={24} color={color} />
-              <Text style={[styles.label, { color }]}>{label}</Text>
+              <Icon
+                name={iconName}
+                size={30}
+                color={focused ? '#ffffff' : '#64748b'} // 🔥 white / gray
+              />
+              <Text style={styles.label}>{label}</Text>
             </View>
           );
         },
@@ -72,7 +76,7 @@ export default function BottomTabs() {
                 style={[
                   styles.scanButton,
                   {
-                    backgroundColor: focused ? '#15743c' : '#ccc',
+                    backgroundColor: focused ? '#15743c' : '#1e293b', // 🔥 dark gray idle
                     transform: [{ scale: focused ? 1.1 : 1 }],
                   },
                 ]}
@@ -80,18 +84,11 @@ export default function BottomTabs() {
                 <Icon
                   name="qrcode-scan"
                   size={28}
-                  color={focused ? 'white' : '#555'}
+                  color="#ffffff" // 🔥 always white
                 />
               </View>
 
-              <Text
-                style={[
-                  styles.scanLabel,
-                  { color: focused ? '#15743c' : 'gray' },
-                ]}
-              >
-                Scan
-              </Text>
+              <Text style={styles.label}>Scan</Text>
             </View>
           ),
         }}
@@ -110,16 +107,17 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 5,
     fontWeight: 'bold',
+    color: '#ffffff', // 🔥 always white
   },
 
   // 🔥 Scan button styles
   scanWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -10, // 🔥 lift up entire scan button
+    marginTop: -10,
   },
 
   scanButton: {
@@ -129,12 +127,10 @@ const styles = StyleSheet.create({
 
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-  },
 
-  scanLabel: {
-    fontSize: 11,
-    marginTop: 2, // tighter spacing
-    fontWeight: 'bold',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
 });

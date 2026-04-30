@@ -7,8 +7,11 @@ export default function TopBar({ navigation }: any) {
     <View style={styles.container}>
       
       {/* LEFT: MENU */}
-      <TouchableOpacity onPress={() => navigation.openDrawer()}>
-        <Icon name="menu" size={26} color="white" />
+      <TouchableOpacity
+        onPress={() => navigation.openDrawer()}
+        style={styles.menu}
+      >
+        <Icon name="menu" size={30} color="white" />
       </TouchableOpacity>
 
       {/* CENTER: ICON + TITLE */}
@@ -20,25 +23,23 @@ export default function TopBar({ navigation }: any) {
         <Text style={styles.title}>EZChargeEV</Text>
       </View>
 
-      {/* RIGHT: NOTIFICATION */}
-      <TouchableOpacity>
-        <Icon name="bell-outline" size={24} color="white" />
-      </TouchableOpacity>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    height: 65,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    justifyContent: 'center', 
 
-    backgroundColor: '#0f172a', 
+    backgroundColor: '#020617',
+  },
+
+  menu: {
+    position: 'absolute',
+    left: 16,
   },
 
   center: {
@@ -47,15 +48,16 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 28,
-    height: 28,
+    width: 40,
+    height: 40,
     marginRight: 8,
-    borderRadius: 6, // smooth icon look
+    borderRadius: 6,
+    justifyContent: 'center', // smooth icon look
   },
 
   title: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
   },
 });

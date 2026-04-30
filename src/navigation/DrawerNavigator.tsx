@@ -1,7 +1,10 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import { getCurrentUser, logout } from '../services/api/authService';
 
 import BottomTabs from './BottomTabs';
 import DrawerStack from './DrawerStack';
@@ -12,26 +15,64 @@ const Drawer = createDrawerNavigator();
    CUSTOM DRAWER UI
 ============================== */
 function CustomDrawerContent(props: any) {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    const u = await getCurrentUser();
+    setUser(u);
+  };
+
   return (
     <DrawerContentScrollView {...props}>
 
       {/* 🔥 HEADER */}
       <View style={styles.drawerHeader}>
-        <Icon name="account-circle" size={50} color="#15743c" />
-        <Text style={styles.userName}>EV User</Text>
-        <Text style={styles.userEmail}>user@email.com</Text>
-      </View>
+
+      {/* 🔥 APP BRANDING */}
+      <Image
+        source={require('../Icon/EZChargeEV_Icon.png')}
+        style={styles.appIconLarge}
+      />
+      <Text style={styles.appName}>EZChargeEV</Text>
+
+      {/* USER INFO */}
+      <Text style={styles.userName}>
+        {user?.email?.split('@')[0] || 'EV User'}
+      </Text>
+
+      <Text style={styles.userEmail}>
+        {user?.email || 'No email'}
+      </Text>
+    </View>
 
       {/* 🔥 MENU ITEMS */}
       <DrawerItem
         label="Home"
-        icon={({ color }) => <Icon name="home" size={22} color={color} />}
+        icon={({ focused }) => (
+          <Icon
+            name="home"
+            size={26}
+            color={focused ? '#22c55e' : '#e2e8f0'}
+          />
+        )}
+        labelStyle={styles.drawerLabel}
         onPress={() => props.navigation.navigate('Home')}
       />
 
       <DrawerItem
-        label="Charging History"
-        icon={({ color }) => <Icon name="history" size={22} color={color} />}
+        label="Charging History "
+        icon={({ focused }) => (
+          <Icon
+            name="history"
+            size={26}
+            color={focused ? '#22c55e' : '#e2e8f0'}
+          />
+        )}
+        labelStyle={styles.drawerLabel}
         onPress={() =>
           props.navigation.navigate('Charging History', {
             screen: 'History',
@@ -41,9 +82,14 @@ function CustomDrawerContent(props: any) {
 
       <DrawerItem
         label="Payment & Wallet"
-        icon={({ color }) => (
-          <Icon name="account-balance-wallet" size={22} color={color} />
+        icon={({ focused }) => (
+          <Icon
+            name="account-balance-wallet"
+            size={26}
+            color={focused ? '#22c55e' : '#e2e8f0'}
+          />
         )}
+        labelStyle={styles.drawerLabel}
         onPress={() =>
           props.navigation.navigate('Payment & Wallet', {
             screen: 'Payment',
@@ -53,7 +99,14 @@ function CustomDrawerContent(props: any) {
 
       <DrawerItem
         label="Help"
-        icon={({ color }) => <Icon name="help-outline" size={22} color={color} />}
+        icon={({ focused }) => (
+          <Icon
+            name="help-outline"
+            size={26}
+            color={focused ? '#22c55e' : '#e2e8f0'}
+          />
+        )}
+        labelStyle={styles.drawerLabel}
         onPress={() =>
           props.navigation.navigate('Help', {
             screen: 'Help',
@@ -63,22 +116,32 @@ function CustomDrawerContent(props: any) {
 
       <DrawerItem
         label="Terms"
-        icon={({ color }) => <Icon name="description" size={22} color={color} />}
+        icon={({ focused }) => (
+          <Icon
+            name="description"
+            size={26}
+            color={focused ? '#22c55e' : '#e2e8f0'}
+          />
+        )}
+        labelStyle={styles.drawerLabel}
         onPress={() =>
           props.navigation.navigate('Terms', {
             screen: 'Terms',
           })
         }
       />
-
+      
       {/* 🔥 Divider */}
       <View style={styles.divider} />
 
       {/* 🔥 Logout */}
       <DrawerItem
         label="Logout"
-        icon={({ color }) => <Icon name="logout" size={22} color={color} />}
-        onPress={() => console.log('Logout pressed')}
+        icon={() => <Icon name="logout" size={26} color="#ef4444" />}
+        labelStyle={styles.logoutLabel}
+        onPress={async () => {
+          await logout();
+        }}
       />
     </DrawerContentScrollView>
   );
@@ -92,8 +155,15 @@ export default function DrawerNavigator() {
     <Drawer.Navigator
       screenOptions={{
         headerShown: false,
-        drawerActiveTintColor: '#15743c',
-        drawerInactiveTintColor: 'gray',
+        drawerStyle: {
+          backgroundColor: '#020617',
+        },
+        drawerActiveTintColor: '#22c55e',
+        drawerInactiveTintColor: '#cbd5f5', // 🔥 brighter
+        drawerLabelStyle: {
+          fontWeight: '600',
+          fontSize: 14,
+        },
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
@@ -130,27 +200,60 @@ export default function DrawerNavigator() {
    STYLES
 ============================== */
 const styles = StyleSheet.create({
-  drawerHeader: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    marginBottom: 10,
-  },
+drawerHeader: {
+  paddingVertical: 30,
+  paddingHorizontal: 20,
+  backgroundColor: '#020617',
+  borderBottomWidth: 2,
+  borderBottomColor: '#ffffff',
+  alignItems: 'center',
+},
 
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
+/* 🔥 App Branding */
+appIconLarge: {
+  width: 70,
+  height: 70,
+  borderRadius: 16,
+  marginBottom: 10,
+},
 
-  userEmail: {
-    fontSize: 12,
-    color: 'gray',
-  },
+appName: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  color: '#22c55e',
+  marginBottom: 18,
+},
 
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 10,
-  },
+/* 🔥 User */
+userName: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: 'white',
+},
+
+userEmail: {
+  fontSize: 16,
+  color: '#94a3b8',
+  marginTop: 4,
+  marginBottom: -10,
+},
+
+/* 🔥 Drawer Labels */
+drawerLabel: {
+  fontSize: 16,           
+  fontWeight: '600',
+  color: '#e2e8f0',      
+},
+
+logoutLabel: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#ef4444',
+},
+
+divider: {
+  height: 2,
+  backgroundColor: '#ffffff',
+  marginVertical: 15,
+},
 });

@@ -119,7 +119,7 @@ export default function ScanScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
   },
 
   modalTitle: {

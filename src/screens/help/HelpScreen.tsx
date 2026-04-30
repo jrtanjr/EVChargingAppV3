@@ -131,7 +131,7 @@ export default function HelpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
     paddingHorizontal: 15, // 🔥 full width feel
     paddingTop: 20,
   },

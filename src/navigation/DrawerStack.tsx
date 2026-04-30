@@ -1,4 +1,5 @@
 import React from 'react';
+import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -6,7 +7,7 @@ import HistoryScreen from '../screens/history/HistoryScreen';
 import PaymentScreen from '../screens/payment/PaymentScreen';
 import HelpScreen from '../screens/help/HelpScreen';
 import TermsScreen from '../screens/terms/TermsScreen';
-import { TouchableOpacity } from 'react-native';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -34,17 +35,19 @@ export default function DrawerStack({ route }: any) {
     <Stack.Navigator
       screenOptions={({ navigation }) => ({
         headerShown: true,
-        headerStyle: { backgroundColor: '#ffffff' },
-        headerTintColor: '#000',
+        headerStyle: {
+          backgroundColor: '#292929',
+        },
+        headerTintColor: '#ffffff',
         headerTitleAlign: 'center',
 
         
         headerLeft: () => (
             <TouchableOpacity
             onPress={() => navigation.openDrawer()}
-            style={{ marginLeft: 1}}
+            style={styles.menuButton}
             >
-            <Icon name="menu" size={26} />
+            <Icon name="menu" size={30} color = 'white' />
             </TouchableOpacity>
         ),
         })}
@@ -53,9 +56,43 @@ export default function DrawerStack({ route }: any) {
         name="DrawerStackScreen"
         component={ScreenComponent}
         options={{
-          title: screen,
+          headerTitle: () => (
+            <View style={styles.headerCenter}>
+              <Image
+                source={require('../Icon/EZChargeEV_Icon.png')}
+                style={styles.headerIcon}
+              />
+              <Text style={styles.headerTitle}>{screen}</Text>
+            </View>
+          ),
         }}
       />
     </Stack.Navigator>
   );
 }
+
+const styles=StyleSheet.create({
+
+headerCenter: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
+headerIcon: {
+  width: 40,
+  height: 40,
+  borderRadius: 6,
+  marginRight: 8,
+},
+
+headerTitle: {
+  color: '#ffffff',
+  fontSize: 20,
+  fontWeight: 'bold',
+},
+
+menuButton: {
+  padding: 6,
+},
+
+});

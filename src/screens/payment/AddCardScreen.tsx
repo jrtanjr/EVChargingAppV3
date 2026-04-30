@@ -201,7 +201,7 @@ export default function AddCardScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#020617',
     padding: 20,
   },
 
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
 
   // ================= BUTTON =================
   btn: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#15743c',
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
