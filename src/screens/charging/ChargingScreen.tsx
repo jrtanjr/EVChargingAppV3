@@ -104,7 +104,7 @@ export default function ChargingScreen({ route, navigation }: any) {
   }, [battery]);
 
   // ==============================
-  // IDLE LOGIC (KEEP THIS 🔥)
+  // IDLE LOGIC (KEEP THIS   )
   // ==============================
   useEffect(() => {
     if (!hasDisconnected && !isFull) return;

@@ -20,7 +20,7 @@ export default function BottomTabs() {
 
         tabBarStyle: {
           height: 75,
-          backgroundColor: '#020617', // 🔥 match drawer
+          backgroundColor: '#020617', //    match drawer
           borderTopWidth: 0,
           elevation: 10,
         },
@@ -54,7 +54,7 @@ export default function BottomTabs() {
               <Icon
                 name={iconName}
                 size={30}
-                color={focused ? '#ffffff' : '#64748b'} // 🔥 white / gray
+                color={focused ? '#ffffff' : '#64748b'} //    white / gray
               />
               <Text style={styles.label}>{label}</Text>
             </View>
@@ -65,7 +65,7 @@ export default function BottomTabs() {
       <Tab.Screen name="Map" component={MapStack} />
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
 
-      {/* 🔥 SCAN BUTTON */}
+      {/*    SCAN BUTTON */}
       <Tab.Screen
         name="Scan"
         component={ScanScreen}
@@ -76,7 +76,7 @@ export default function BottomTabs() {
                 style={[
                   styles.scanButton,
                   {
-                    backgroundColor: focused ? '#15743c' : '#1e293b', // 🔥 dark gray idle
+                    backgroundColor: focused ? '#15743c' : '#1e293b', //    dark gray idle
                     transform: [{ scale: focused ? 1.1 : 1 }],
                   },
                 ]}
@@ -84,7 +84,7 @@ export default function BottomTabs() {
                 <Icon
                   name="qrcode-scan"
                   size={28}
-                  color="#ffffff" // 🔥 always white
+                  color="#ffffff" //    always white
                 />
               </View>
 
@@ -110,10 +110,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
     fontWeight: 'bold',
-    color: '#ffffff', // 🔥 always white
+    color: '#ffffff', //    always white
   },
 
-  // 🔥 Scan button styles
+  //    Scan button styles
   scanWrapper: {
     alignItems: 'center',
     justifyContent: 'center',

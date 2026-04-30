@@ -110,7 +110,7 @@ export default function MapScreen({ navigation }: any) {
 
   useEffect(() => {
     if (selectedStation) {
-      setShowNearby(false); // 🔥 hide when popup opens
+      setShowNearby(false); //    hide when popup opens
     }
   }, [selectedStation]);
 

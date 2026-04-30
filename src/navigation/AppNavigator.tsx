@@ -54,7 +54,7 @@ export default function AppNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
 
         {user ? (
-          // 🔥 USER LOGGED IN
+          //    USER LOGGED IN
           <Stack.Screen
             name="Main"
             component={DrawerNavigator}

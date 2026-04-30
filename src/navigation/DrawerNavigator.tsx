@@ -29,10 +29,10 @@ function CustomDrawerContent(props: any) {
   return (
     <DrawerContentScrollView {...props}>
 
-      {/* 🔥 HEADER */}
+      {/*    HEADER */}
       <View style={styles.drawerHeader}>
 
-      {/* 🔥 APP BRANDING */}
+      {/*    APP BRANDING */}
       <Image
         source={require('../Icon/EZChargeEV_Icon.png')}
         style={styles.appIconLarge}
@@ -49,7 +49,7 @@ function CustomDrawerContent(props: any) {
       </Text>
     </View>
 
-      {/* 🔥 MENU ITEMS */}
+      {/*    MENU ITEMS */}
       <DrawerItem
         label="Home"
         icon={({ focused }) => (
@@ -131,10 +131,10 @@ function CustomDrawerContent(props: any) {
         }
       />
       
-      {/* 🔥 Divider */}
+      {/*    Divider */}
       <View style={styles.divider} />
 
-      {/* 🔥 Logout */}
+      {/*    Logout */}
       <DrawerItem
         label="Logout"
         icon={() => <Icon name="logout" size={26} color="#ef4444" />}
@@ -159,7 +159,7 @@ export default function DrawerNavigator() {
           backgroundColor: '#020617',
         },
         drawerActiveTintColor: '#22c55e',
-        drawerInactiveTintColor: '#cbd5f5', // 🔥 brighter
+        drawerInactiveTintColor: '#cbd5f5', //    brighter
         drawerLabelStyle: {
           fontWeight: '600',
           fontSize: 14,
@@ -209,7 +209,7 @@ drawerHeader: {
   alignItems: 'center',
 },
 
-/* 🔥 App Branding */
+/*    App Branding */
 appIconLarge: {
   width: 70,
   height: 70,
@@ -224,7 +224,7 @@ appName: {
   marginBottom: 18,
 },
 
-/* 🔥 User */
+/*    User */
 userName: {
   fontSize: 18,
   fontWeight: '600',
@@ -238,7 +238,7 @@ userEmail: {
   marginBottom: -10,
 },
 
-/* 🔥 Drawer Labels */
+/*    Drawer Labels */
 drawerLabel: {
   fontSize: 16,           
   fontWeight: '600',
