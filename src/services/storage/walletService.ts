@@ -1,14 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getCurrentUser } from '../api/authService';
 
-const KEY = 'wallet_balance';
+const getKey = async () => {
+  const user = await getCurrentUser();
+  return `wallet_balance_${user?.id}`;
+};
 
 export const getBalance = async () => {
-  const data = await AsyncStorage.getItem(KEY);
-  return data ? parseFloat(data) : 0;
+  const key = await getKey();
+  const value = await AsyncStorage.getItem(key);
+  return value ? parseFloat(value) : 0;
 };
 
 export const setBalance = async (amount: number) => {
-  await AsyncStorage.setItem(KEY, amount.toString());
+  const key = await getKey();
+  await AsyncStorage.setItem(key, amount.toString());
 };
 
 export const topUp = async (amount: number) => {

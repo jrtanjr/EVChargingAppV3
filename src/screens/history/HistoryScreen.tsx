@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+import { getStations } from '../../services/database/stationService';
 import { getChargingFromCloud } from '../../services/api/supabaseService';
 import { getCurrentUser } from '../../services/api/authService';
 
@@ -35,15 +36,27 @@ export default function HistoryScreen() {
 
   const load = async () => { //Each time reopen the application, sync history from cloud
 
-     const user = await getCurrentUser();
-
+    const user = await getCurrentUser();
+    
     const cloud = await getChargingFromCloud();
+    const stations = await getStations(); 
 
-    const filtered = cloud.filter(
-      (item: any) => item.user_id === user?.id
-    );
+    const mapped = cloud.map((item: any) => { // map station name and address from local to cloud data
+      const station = stations.find(
+        (s: any) => Number(s.id) === Number(item.station_id)
+      );
+        return {
+          ...item,
+          station_name: station?.name || 'Unknown Station',
+          address: station?.address || 'Unknown Address',
+        };
+      });
+      
+    const filtered = mapped.filter(
+        (item: any) => item.user_id === user?.id
+      );
 
-    setData(filtered);
+      setData(filtered);
   };
 
   const formatDate = (dateString: string) => {
@@ -63,14 +76,22 @@ export default function HistoryScreen() {
   // ================= FILTER LOGIC =================
   const filteredData = data.filter((item) => {
     const matchSearch =
-      item.station_name
-        ?.toLowerCase()
+      !search ||
+      (item.station_name || '')
+        .toLowerCase()
         .includes(search.toLowerCase());
 
     const txDate = new Date(item.timestamp);
+    txDate.setHours(0, 0, 0, 0);
 
-    if (startDate && txDate < startDate) return false;
-    if (endDate && txDate > endDate) return false;
+    let start = startDate ? new Date(startDate) : null;
+    let end = endDate ? new Date(endDate) : null;
+
+    if (start) start.setHours(0, 0, 0, 0);
+    if (end) end.setHours(0, 0, 0, 0);
+
+    if (start && txDate < start) return false;
+    if (end && txDate > end) return false;
 
     return matchSearch;
   });

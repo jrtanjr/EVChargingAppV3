@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getBalance, topUp } from '../../services/storage/walletService';
 import { getPayments, insertPayment } from '../../services/database/paymentService';
 import { getCard, removeCard } from '../../services/storage/cardService';
+import { getCurrentUser } from '../../services/api/authService';
 
 export default function PaymentScreen({ navigation }: any) {
 
@@ -69,8 +70,11 @@ export default function PaymentScreen({ navigation }: any) {
     }
     const newBalance = await topUp(amount);
 
+    const user = await getCurrentUser();
+
     // Save transaction
     await insertPayment({
+      user_id: user?.id,
       amount,
       method: 'topup',
       status: 'success',
@@ -114,7 +118,6 @@ export default function PaymentScreen({ navigation }: any) {
   // FILTER LOGIC
   // ==============================
   const filteredPayments = payments.filter((p) => {
-    
     if (filter === 'charging') {
       if (!(p.method === 'wallet' || p.method === 'card')) return false;
     }
@@ -123,11 +126,17 @@ export default function PaymentScreen({ navigation }: any) {
       if (p.method !== 'topup') return false;
     }
 
-    //Date filter
     const txDate = new Date(p.timestamp);
+    txDate.setHours(0, 0, 0, 0);
 
-    if (startDate && txDate < startDate) return false;
-    if (endDate && txDate > endDate) return false;
+    let start = startDate ? new Date(startDate) : null;
+    let end = endDate ? new Date(endDate) : null;
+
+    if (start) start.setHours(0, 0, 0, 0);
+    if (end) end.setHours(0, 0, 0, 0);
+
+    if (start && txDate < start) return false;
+    if (end && txDate > end) return false;
 
     return true;
   });

@@ -22,15 +22,15 @@ export const saveChargingToCloud = async (data: any) => {
 
 // ================= GET CHARGING =================
 export const getChargingFromCloud = async () => {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/charging_history?select=*`
-    );
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/charging_history?select=*`,
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+    }
+  );
 
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.log(err);
-    return [];
-  }
+  return await res.json();
 };

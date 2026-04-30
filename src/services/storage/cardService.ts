@@ -1,16 +1,23 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getCurrentUser } from '../api/authService';
 
-const KEY = 'linked_card';
-
-export const saveCard = async (card: any) => {
-  await AsyncStorage.setItem(KEY, JSON.stringify(card));
+const getKey = async () => {
+  const user = await getCurrentUser();
+  return `card_${user?.id}`;
 };
 
 export const getCard = async () => {
-  const data = await AsyncStorage.getItem(KEY);
+  const key = await getKey();
+  const data = await AsyncStorage.getItem(key);
   return data ? JSON.parse(data) : null;
 };
 
+export const saveCard = async (card: any) => {
+  const key = await getKey();
+  await AsyncStorage.setItem(key, JSON.stringify(card));
+};
+
 export const removeCard = async () => {
-  await AsyncStorage.removeItem(KEY);
+  const key = await getKey();
+  await AsyncStorage.removeItem(key);
 };

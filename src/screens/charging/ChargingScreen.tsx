@@ -9,6 +9,7 @@ import { getCard } from '../../services/storage/cardService';
 import { saveChargingToCloud } from '../../services/api/supabaseService';
 import { getCurrentUser } from '../../services/api/authService';
 
+
 export default function ChargingScreen({ route, navigation }: any) {
   const { station, connectors, paymentMethod, budget, cardLast4 } = route.params;
 
@@ -121,8 +122,6 @@ export default function ChargingScreen({ route, navigation }: any) {
   const chargingCost = energy * chargingRate;
   const idleCost = Math.floor(idleTime / 300) * 1;
 
-  const totalCost = chargingCost + idleCost;
-
   // ==============================
   // REMAINING TIME AND ENERGY
   // ==============================
@@ -147,6 +146,8 @@ export default function ChargingScreen({ route, navigation }: any) {
 
       let walletBalance = await getBalance();
 
+      const user = await getCurrentUser();
+
       // CARD PAYMENT FLOW
       if (paymentMethod === 'card') { 
         if (totalCost > 150) {
@@ -159,6 +160,7 @@ export default function ChargingScreen({ route, navigation }: any) {
         const card = await getCard();
 
         await insertPayment({
+          user_id: user?.id,
           charging_id: Date.now(),
           amount: totalCost,
           method: 'card',
@@ -176,6 +178,7 @@ export default function ChargingScreen({ route, navigation }: any) {
         await setBalance(walletBalance);
 
         await insertPayment({
+          user_id: user?.id,
           charging_id: Date.now(),
           amount: totalCost,
           method: 'wallet',
@@ -192,8 +195,7 @@ export default function ChargingScreen({ route, navigation }: any) {
         status,
       });
 
-      const user = await getCurrentUser();
-
+      
       await saveChargingToCloud({ //Save to Cloud supabase
         user_id: user?.id, 
         station_id: station.id,

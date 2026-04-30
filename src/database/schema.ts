@@ -44,6 +44,7 @@ export const createTables = async () => {
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS charging_history (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT,
       station_id INTEGER,
       energy REAL,
       duration INTEGER,
@@ -58,6 +59,7 @@ export const createTables = async () => {
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS payments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT,
       charging_id INTEGER,
       amount REAL,
       method TEXT,

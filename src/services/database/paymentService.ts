@@ -1,6 +1,11 @@
 import { getDBConnection } from '../../database/sqlite';
+import { getCurrentUser } from '../api/authService';
 
+// ==============================
+// INSERT PAYMENT
+// ==============================
 export const insertPayment = async ({
+  user_id,
   charging_id,
   amount,
   method,
@@ -9,11 +14,19 @@ export const insertPayment = async ({
 }: any) => {
   const db = await getDBConnection();
 
+  let userId = user_id;
+  if (!userId) {
+    const user = await getCurrentUser();
+    userId = user?.id;
+  }
+
   await db.executeSql(
-    `INSERT INTO payments (charging_id, amount, method, status, card_last4, timestamp)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO payments 
+     (user_id, charging_id, amount, method, status, card_last4, timestamp)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [
-      charging_id,
+      userId,                
+      charging_id || null,
       amount,
       method,
       status,
@@ -23,12 +36,22 @@ export const insertPayment = async ({
   );
 };
 
+// ==============================
+// GET PAYMENTS (USER FILTERED)
+// ==============================
 export const getPayments = async () => {
-  const db = await getDBConnection();
+  const db = await getDBConnection(); 
 
-  const results = await db.executeSql(
-    `SELECT * FROM payments ORDER BY timestamp DESC`
+  const user = await getCurrentUser();
+
+  if (!user?.id) return [];
+
+  const result = await db.executeSql(
+    `SELECT * FROM payments 
+     WHERE user_id = ? 
+     ORDER BY timestamp DESC`,
+    [user.id]
   );
 
-  return results[0].rows.raw();
+  return result[0].rows.raw();
 };
