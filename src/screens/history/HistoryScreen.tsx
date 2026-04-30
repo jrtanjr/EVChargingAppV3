@@ -4,7 +4,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { getChargingHistory } from '../../services/database/chargingService';
+import { getChargingFromCloud } from '../../services/api/supabaseService';
+import { getCurrentUser } from '../../services/api/authService';
+
 import SearchBar from '../../components/map/SearchBar';
 
 export default function HistoryScreen() {
@@ -31,9 +33,17 @@ export default function HistoryScreen() {
     }, [])
   );
 
-  const load = async () => {
-    const history = await getChargingHistory();
-    setData(history);
+  const load = async () => { //Each time reopen the application, sync history from cloud
+
+     const user = await getCurrentUser();
+
+    const cloud = await getChargingFromCloud();
+
+    const filtered = cloud.filter(
+      (item: any) => item.user_id === user?.id
+    );
+
+    setData(filtered);
   };
 
   const formatDate = (dateString: string) => {

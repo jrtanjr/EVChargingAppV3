@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import DrawerNavigator from './src/navigation/DrawerNavigator';
+import AppNavigator from './src/navigation/AppNavigator';
 import { initDatabase } from './src/database/schema';
 
 export default function App() {
@@ -15,13 +14,7 @@ export default function App() {
     setup();
   }, []);
 
-  if (!dbReady) {
-    return null; // or loading screen
-  }
+  if (!dbReady) return null;
 
-  return (
-    <NavigationContainer>
-      <DrawerNavigator />
-    </NavigationContainer>
-  );
+  return <AppNavigator />;
 }

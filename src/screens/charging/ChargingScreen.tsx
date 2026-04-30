@@ -6,6 +6,8 @@ import { insertChargingHistory } from '../../services/database/chargingService';
 import { insertPayment } from '../../services/database/paymentService';
 import { getBalance, setBalance } from '../../services/storage/walletService';
 import { getCard } from '../../services/storage/cardService';
+import { saveChargingToCloud } from '../../services/api/supabaseService';
+import { getCurrentUser } from '../../services/api/authService';
 
 export default function ChargingScreen({ route, navigation }: any) {
   const { station, connectors, paymentMethod, budget, cardLast4 } = route.params;
@@ -188,6 +190,18 @@ export default function ChargingScreen({ route, navigation }: any) {
         duration: seconds + idleTime,
         cost: totalCost,
         status,
+      });
+
+      const user = await getCurrentUser();
+
+      await saveChargingToCloud({ //Save to Cloud supabase
+        user_id: user?.id, 
+        station_id: station.id,
+        energy,
+        duration: seconds + idleTime,
+        cost: totalCost,
+        status,
+        timestamp: new Date().toISOString(),
       });
 
       navigation.navigate('ChargingResult', {

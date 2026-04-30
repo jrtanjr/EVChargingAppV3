@@ -56,9 +56,6 @@ export default function MapScreen({ navigation }: any) {
 
   const route = useRoute<any>();
 
-  useEffect(() => {
-    console.log('ROUTE PARAMS:', route.params);
-  }, [route.params]);
 
   useEffect(() => {
     init();
