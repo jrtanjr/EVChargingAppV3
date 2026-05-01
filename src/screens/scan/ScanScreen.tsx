@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginTop: 10,
     fontWeight: 'bold',
+    fontSize: 20,
   },
 
   modalContainer: {
