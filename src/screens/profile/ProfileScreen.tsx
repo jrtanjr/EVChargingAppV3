@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { getCurrentUser, logout } from '../../services/api/authService';
@@ -99,6 +99,15 @@ export default function ProfileScreen( ) {
 
       <View style={styles.content}>
 
+      {/* APP ICON */}
+      <View style={styles.appIcon}>
+        <Image
+          source={require('../../Icon/EZChargeEV_Icon.png')}
+          style={styles.logo}
+          />
+          <Text style={styles.title}>EZChargeEV</Text>
+        </View>
+
       {/* AVATAR */}
         <View style={{ alignItems: 'center', marginBottom: 10 }}>
           <Icon name="account-circle" size={200} color="#22c55e" />
@@ -147,10 +156,10 @@ export default function ProfileScreen( ) {
         ) : (
           <>
             <Text style={styles.label}>
-              Phone: {profile.phone || '-'}
+              Phone: {profile.phone || ''}
             </Text>
             <Text style={styles.label}>
-              Car Plate: {profile.car_plate || '-'}
+              Car Plate: {profile.car_plate || ''}
             </Text>
           </>
         )}
@@ -201,6 +210,25 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
+  appIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  logo: {
+    width: 80,
+    height: 80,
+    marginRight: 15,
+    borderRadius: 20,
+    justifyContent: 'center', 
+  },
+
+  title: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 30,
+  },
+
   avatar: {
     width: 110,
     height: 110,
@@ -211,7 +239,7 @@ const styles = StyleSheet.create({
   },
 
   email: {
-    color: '#9ca3af',
+    color: '#ffffff',
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
@@ -220,15 +248,15 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     backgroundColor: '#1f2937',
-    padding: 16,
+    padding: 10,
     borderRadius: 14,
-    marginTop: 15,
+    marginTop: 5,
   },
 
   label: {
     color: 'white',
-    fontSize: 16,
-    marginBottom: 10,
+    fontSize: 18,
+    marginBottom: 5,
     fontWeight: 'bold',
   },
 
@@ -304,7 +332,7 @@ const styles = StyleSheet.create({
 
   btnText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 

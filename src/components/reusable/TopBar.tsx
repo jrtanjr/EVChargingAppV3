@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: 8,
-    borderRadius: 6,
-    justifyContent: 'center', // smooth icon look
+    borderRadius: 20,
+    justifyContent: 'center', 
   },
 
   title: {
