@@ -8,7 +8,7 @@ import { getStations } from '../../services/database/stationService';
 import { getChargingFromCloud } from '../../services/api/supabaseService';
 import { getCurrentUser } from '../../services/api/authService';
 
-import SearchBar from '../../components/map/SearchBar';
+import SearchBar from '../../components/reusable/SearchBar';
 
 export default function HistoryScreen() {
   const [data, setData] = useState<any[]>([]);
@@ -275,12 +275,12 @@ export default function HistoryScreen() {
             value={tempEndDate || new Date()}
             mode="date"
             display="default"
-            minimumDate={tempStartDate || undefined} // ✅ prevents invalid selection
+            minimumDate={tempStartDate || undefined} // prevents invalid selection
             onChange={(event, date) => {
               setShowEndPicker(false);
 
               if (date) {
-                setTempEndDate(date); // ✅ no need for extra validation
+                setTempEndDate(date); // no need for extra validation
               }
             }}
           />

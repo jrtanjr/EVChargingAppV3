@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { getStations, getConnectorsByStation } from '../../services/database/stationService';
 
-import StationCard from '../../components/stations/StationCard';
+import StationCard from '../../components/reusable/StationCard';
 
 export default function ScanScreen({ navigation }: any) {
   const [loading, setLoading] = useState(false);

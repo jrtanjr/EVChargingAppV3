@@ -5,10 +5,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
 import { useRoute } from '@react-navigation/native';
 
-import TopBar from '../../components/map/TopBar';
+import TopBar from '../../components/reusable/TopBar';
 import StationPopup from '../../components/stations/StationPopup';
-import FilterModal from '../../components/map/FilterModal';
-import SearchBar from '../../components/map/SearchBar';
+import FilterModal from '../../components/reusable/FilterModal';
+import SearchBar from '../../components/reusable/SearchBar';
 
 import { fetchStationsFromAPI, transformStations, getDistanceKm } from '../../services/api/apiService';
 import { insertStationsWithConnectors, getStations, getConnectorsByStation } from '../../services/database/stationService';

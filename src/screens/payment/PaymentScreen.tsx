@@ -454,12 +454,12 @@ export default function PaymentScreen({ navigation }: any) {
             value={tempEndDate || new Date()}
             mode="date"
             display="default"
-            minimumDate={tempStartDate || undefined} // ✅ prevents invalid selection
+            minimumDate={tempStartDate || undefined} // prevents invalid selection
             onChange={(event, date) => {
               setShowEndPicker(false);
 
               if (date) {
-                setTempEndDate(date); // ✅ no need for extra validation
+                setTempEndDate(date); 
               }
             }}
           />

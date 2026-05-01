@@ -6,11 +6,11 @@ import Geolocation from '@react-native-community/geolocation';
 
 import { getStations, getConnectorsByStation } from '../../services/database/stationService';
 import { getFavourites, toggleFavourite } from '../../services/storage/favouriteService';
-import SearchBar from '../../components/map/SearchBar';
+import SearchBar from '../../components/reusable/SearchBar';
 import { getDistanceKm } from '../../services/api/apiService';
 
-import FilterModal from '../../components/map/FilterModal';
-import StationCard from '../../components/stations/StationCard';
+import FilterModal from '../../components/reusable/FilterModal';
+import StationCard from '../../components/reusable/StationCard';
 
 
 export default function FavouriteScreen({ navigation }: any) {

@@ -8,6 +8,8 @@ export default function StationCard({
   connectors = [],
   userLocation,
   showStatus = true,
+  acRate = 0.57,
+  dcRate = 1.20,
 }: any) {
 
   const distance = userLocation
@@ -93,8 +95,13 @@ export default function StationCard({
       {/* AC */}
       {acTotal > 0 && (
         <View style={styles.infoRow}>
-          <Icon name="power-plug" size={18} color="#3b82f6" />
-          <Text style={styles.infoText}>AC • {acPower} kW</Text>
+          <Icon name="power-plug" size={20} color="#3b82f6" />
+
+          <View style={styles.infoCenter}>
+            <Text style={styles.infoText}>AC • {acPower} kW</Text>
+            <Text style={styles.priceText}>RM {acRate.toFixed(2)}/kWh</Text>
+          </View>
+
           <View style={[styles.badge, { backgroundColor: '#3b82f6' }]}>
             <Text style={styles.badgeText}>
               {acAvailable}/{acTotal}
@@ -102,12 +109,17 @@ export default function StationCard({
           </View>
         </View>
       )}
-
+      
       {/* DC */}
       {dcTotal > 0 && (
         <View style={styles.infoRow}>
-          <Icon name="flash" size={18} color="#f97316" />
-          <Text style={styles.infoText}>DC • {dcPower} kW</Text>
+          <Icon name="flash" size={20} color="#f97316" />
+
+          <View style={styles.infoCenter}>
+            <Text style={styles.infoText}>DC • {dcPower} kW</Text>
+            <Text style={styles.priceText}>RM {dcRate.toFixed(2)}/kWh</Text>
+          </View>
+
           <View style={[styles.badge, { backgroundColor: '#f97316' }]}>
             <Text style={styles.badgeText}>
               {dcAvailable}/{dcTotal}
@@ -147,54 +159,79 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: '#22c55e',
   },
+
   address: {
     color: '#ffffff',
     marginBottom: 8,
     fontWeight: 'bold',
   },
+
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 8,
   },
+
   tag: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
     marginRight: 6,
   },
+
   tagText: {
     color: 'white',
     fontSize: 11,
     fontWeight: 'bold',
   },
+
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
+
   infoText: {
     flex: 1,
     marginLeft: 8,
     color: '#e5e7eb',
     fontWeight: 'bold',
   },
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+
+  infoCenter: {
+    flex: 1,
+    marginLeft: 8,
   },
+
+  priceText: {
+    color: '#22c55e',
+    fontSize: 13,
+    fontWeight: 'bold',
+    position: 'absolute',
+    right: 50,
+   
+  },
+
+  badge: {
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
+    bottom: 5,
+  },
+
   badgeText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
   },
+
   distance: {
     color: '#ffffff',
     fontWeight: 'bold',
     marginBottom: 6,
   },
+
   status: {
     fontWeight: 'bold',
   },
