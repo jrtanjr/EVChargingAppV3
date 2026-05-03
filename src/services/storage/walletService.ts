@@ -30,10 +30,3 @@ export const deduct = async (amount: number) => {
   await setBalance(newBalance);
   return newBalance;
 };
-
-export const adjustBalance = async (amount: number) => {
-  const current = await getBalance();
-  const newBalance = current + amount; // can be negative
-  await setBalance(newBalance);
-  return newBalance;
-};

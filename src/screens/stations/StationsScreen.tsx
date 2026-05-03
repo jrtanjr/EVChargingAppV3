@@ -7,7 +7,6 @@ import Geolocation from '@react-native-community/geolocation';
 import { getStations, getConnectorsByStation } from '../../services/database/stationService';
 import { toggleFavourite, getFavourites } from '../../services/storage/favouriteService';
 import SearchBar from '../../components/reusable/SearchBar';
-import { getDistanceKm } from '../../services/api/apiService';
 
 import FilterModal from '../../components/reusable/FilterModal';
 import StationCard from '../../components/reusable/StationCard';
@@ -144,35 +143,12 @@ export default function StationsScreen({ navigation }: any) {
 
   // ================= RENDER =================
   const renderItem = ({ item }: any) => {
-    const isAvailable = item.available_ports > 0;
+    
     const isFav = favIds.includes(item.id);
 
-    const distance = userLocation
-      ? getDistanceKm(
-          userLocation.latitude,
-          userLocation.longitude,
-          item.latitude,
-          item.longitude
-        )
-      : null;
 
     const connectors = connectorsMap[item.id] || [];
-
-    const ac = connectors.filter((c: any) =>
-      c.current_type?.toUpperCase().includes('AC')
-    );
-
-    const dc = connectors.filter((c: any) =>
-      c.current_type?.toUpperCase().includes('DC')
-    );
-
-    const acTotal = ac.reduce((sum: number, c: any) => sum + c.quantity, 0);
-    const acAvailable = ac.reduce((sum: number, c: any) => sum + c.available, 0);
-    const acPower = ac.length > 0 ? Math.max(...ac.map((c: any) => c.power_kw || 0)) : 0;
-
-    const dcTotal = dc.reduce((sum: number, c: any) => sum + c.quantity, 0);
-    const dcAvailable = dc.reduce((sum: number, c: any) => sum + c.available, 0);
-    const dcPower = dc.length > 0 ? Math.max(...dc.map((c: any) => c.power_kw || 0)) : 0;
+    
 
     return (
       <TouchableOpacity
@@ -289,77 +265,6 @@ const styles = StyleSheet.create({
 
   starBtn: {
     paddingTop: 2,
-  },
-
-  innerBox: {
-    marginTop: 12,
-    backgroundColor: '#111827',
-    padding: 14,
-    borderRadius: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#22c55e',
-  },
-
-  address: {
-    color: '#ffffff',
-    marginBottom: 8,
-    fontWeight: 'bold',
-  },
-
-  tagRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 8,
-  },
-
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginRight: 6,
-    marginBottom: 4,
-  },
-
-  tagText: {
-    color: 'white',
-    fontSize: 11,
-    fontWeight: 'bold',
-  },
-
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-
-  infoText: {
-    flex: 1,
-    marginLeft: 8,
-    color: '#e5e7eb',
-    fontWeight: 'bold',
-  },
-
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-
-  badgeText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-
-  distance: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-
-  status: {
-    fontWeight: 'bold',
   },
 
   emptyContainer: {

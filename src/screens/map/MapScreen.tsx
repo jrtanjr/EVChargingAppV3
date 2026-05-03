@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
 
   clusterOuter: {
-    backgroundColor: 'rgba(21, 116, 60, 0.25)', // consistent dark green glow
+    backgroundColor: 'rgba(21, 116, 60, 0.25)', 
     borderRadius: 30,
     padding: 6,
   },

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { insertChargingHistory } from '../../services/database/chargingService';
+// import { insertChargingHistory } from '../../services/database/chargingService';
 import { insertPayment } from '../../services/database/paymentService';
 import { getBalance, setBalance } from '../../services/storage/walletService';
 import { getCard } from '../../services/storage/cardService';
@@ -38,7 +38,7 @@ export default function ChargingScreen({ route, navigation }: any) {
   const [idleTime, setIdleTime] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
-  const animatedValue = useState(new Animated.Value(initialBattery))[0]; // for smooth battery animation
+  const animatedValue = useState(new Animated.Value(initialBattery))[0]; // for battery animation
 
   // ==============================
   // AVAILABLE CONNECTORS
@@ -137,7 +137,7 @@ export default function ChargingScreen({ route, navigation }: any) {
 
   
   // ==============================
-  // FINISH CHARGING (SAVE TO DB, DEDUCT WALLET, ETC)
+  // FINISH CHARGING (SAVE TO DB, DEDUCT WALLET)
   // ==============================
   const handleFinish = async (status: 'completed' | 'stopped') => {
     if (!selectedConnector || power === 0) return;
@@ -187,13 +187,13 @@ export default function ChargingScreen({ route, navigation }: any) {
         });
       }
 
-      await insertChargingHistory({
-        station_id: station.id,
-        energy,
-        duration: seconds + idleTime,
-        cost: totalCost,
-        status,
-      });
+      // await insertChargingHistory({
+      //   station_id: station.id,
+      //   energy,
+      //   duration: seconds + idleTime,
+      //   cost: totalCost,
+      //   status,
+      // });
 
       
       await saveChargingToCloud({ //Save to Cloud supabase

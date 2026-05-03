@@ -159,7 +159,7 @@ export default function DrawerNavigator() {
           backgroundColor: '#020617',
         },
         drawerActiveTintColor: '#22c55e',
-        drawerInactiveTintColor: '#cbd5f5', //    brighter
+        drawerInactiveTintColor: '#cbd5f5', 
         drawerLabelStyle: {
           fontWeight: '600',
           fontSize: 14,

@@ -1,41 +1,44 @@
-import { getDBConnection } from '../../database/sqlite';
+// import { getDBConnection } from '../../database/sqlite';
 
-export const insertChargingHistory = async ({
-  station_id,
-  energy,
-  duration,
-  cost,
-  status,
-}: any) => {
-  const db = await getDBConnection();
 
-  await db.executeSql(
-    `INSERT INTO charging_history 
-    (station_id, energy, duration, cost, status, timestamp)
-    VALUES (?, ?, ?, ?, ?, ?)`,
-    [
-      station_id,
-      energy,
-      duration,
-      cost,
-      status,
-      new Date().toISOString(),
-    ]
-  );
-};
+// Migrate from local SQLite to Cloud connectivity in supabaseService.ts
 
-export const getChargingHistory = async () => {
-  const db = await getDBConnection();
+// export const insertChargingHistory = async ({
+//   station_id,
+//   energy,
+//   duration,
+//   cost,
+//   status,
+// }: any) => {
+//   const db = await getDBConnection();
 
-  const results = await db.executeSql(`
-    SELECT 
-      h.*,
-      s.name as station_name,
-      s.address as address
-    FROM charging_history h
-    LEFT JOIN stations s ON h.station_id = s.id
-    ORDER BY h.timestamp DESC
-  `);
+//   await db.executeSql(
+//     `INSERT INTO charging_history 
+//     (station_id, energy, duration, cost, status, timestamp)
+//     VALUES (?, ?, ?, ?, ?, ?)`,
+//     [
+//       station_id,
+//       energy,
+//       duration,
+//       cost,
+//       status,
+//       new Date().toISOString(),
+//     ]
+//   );
+// };
 
-  return results[0].rows.raw();
-};
+// export const getChargingHistory = async () => { //mirate to fetch charging history from cloud
+//   const db = await getDBConnection();
+
+//   const results = await db.executeSql(`
+//     SELECT 
+//       h.*,
+//       s.name as station_name,
+//       s.address as address
+//     FROM charging_history h
+//     LEFT JOIN stations s ON h.station_id = s.id
+//     ORDER BY h.timestamp DESC
+//   `);
+
+//   return results[0].rows.raw();
+// };

@@ -55,3 +55,4 @@ export const getPayments = async () => {
 
   return result[0].rows.raw();
 };
+

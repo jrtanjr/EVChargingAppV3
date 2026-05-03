@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#020617',
-    paddingHorizontal: 15, //    full width feel
+    paddingHorizontal: 15, 
     paddingTop: 20,
   },
   
@@ -177,11 +177,11 @@ const styles = StyleSheet.create({
 
   answerBox: {
     marginTop: 12,
-    backgroundColor: '#111827', // darker layer
+    backgroundColor: '#111827', 
     padding: 14,
     borderRadius: 10,
     borderLeftWidth: 3,
-    borderLeftColor: '#22c55e', // subtle accent
+    borderLeftColor: '#22c55e', 
   },
 
   answer: {
