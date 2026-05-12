@@ -1,3 +1,7 @@
+import Config from 'react-native-config';
+
+const API_KEY = Config.OPENCHARGEMAP_API_KEY;
+
 // ================= TYPES =================
 type Connector = {
   type: string;
@@ -23,7 +27,7 @@ type Station = {
 export const fetchStationsFromAPI = async (): Promise<any[]> => {
   try {
     const response = await fetch(
-      'https://api.openchargemap.io/v3/poi/?output=json&countrycode=MY&maxresults=20&key=bc445262-b266-463f-a312-a07b60bc249c'
+      `https://api.openchargemap.io/v3/poi/?output=json&countrycode=MY&maxresults=20&key=${API_KEY}`
     );
 
     const data = await response.json();
