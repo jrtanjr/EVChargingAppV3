@@ -19,3 +19,5 @@ cd ..
 npx react-native run-android
 
 This native app fetch EV stations information from Open Charge Map API, and connected to Google Map Android SDK API for Google Map View. The cloud connection are connected to supabase.
+
+Test 123
