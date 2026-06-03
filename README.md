@@ -40,3 +40,5 @@ Remarks:
 2. All EV Stations's availavle charger plug data are randomized
 3. Charging, Payment are simulated as this is a student-based project
 4. User credentials are managed using supabase authentication
+
+Designed by jrtanjr
